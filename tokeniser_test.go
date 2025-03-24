@@ -1,0 +1,71 @@
+package laks
+
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
+
+func TestTokenise(t *testing.T) {
+	var tests = []struct{
+		in string
+		want []Token
+	}{
+		{
+			in: "",
+			want: nil,
+		},
+		{
+			in: "4",
+			want: []Token{
+				{T_INT, "4"},
+			},
+		},		
+		{
+			in: "4;",
+			want: []Token{
+				{T_INT, "4"},
+				{T_SEMI, ";"},
+			},
+		},
+		{
+			in: "8 * 7;",
+			want: []Token{
+				{T_INT, "8"},
+				{T_MULT, "*"},
+				{T_INT, "7"},
+				{T_SEMI, ";"},
+			},
+		},
+		{
+			in: "\n\n2+2\t\t;",
+			want: []Token{
+				{T_INT, "2"},
+				{T_ADD, "+"},
+				{T_INT, "2"},
+				{T_SEMI, ";"},
+			},
+		},
+		{
+			in: "+/-*",
+			want: []Token{
+				{T_ADD, "+"},
+				{T_DIV, "/"},
+				{T_MINUS, "-"},
+				{T_MULT, "*"},
+			},
+		},
+	}
+
+	for _, tst := range tests {
+		t.Run(tst.in, func(tt *testing.T) {
+			got, err := Tokenise(tst.in)
+			if err != nil {
+				tt.Fatalf("%s", err.Error())
+			}
+			if diff := cmp.Diff(tst.want, got); diff != "" {
+				tt.Errorf("Mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
