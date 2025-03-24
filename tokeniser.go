@@ -32,7 +32,7 @@ type tokeniser struct {
 
 func Tokenise(src string) ([]Token, error) {
 	var runes = []rune(src)
-	var t = tokeniser{runes: runes, current: 0}
+	var t = tokeniser{runes: runes}
 	err := t.tokenise()
 	return t.tokens, err
 }
