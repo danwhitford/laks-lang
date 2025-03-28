@@ -7,14 +7,14 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	var tests = []struct{
+	var tests = []struct {
 		name string
-		in []Token
+		in   []Token
 		want []Expression
 	}{
 		{
 			name: "empty",
-			in: []Token{},
+			in:   []Token{},
 			want: nil,
 		},
 		{
@@ -24,9 +24,9 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Expression{
-				{T: E_LIT, Value: 44},
+				{T: E_LIT, Value: int64(44)},
 			},
-		},	
+		},
 		{
 			name: "simple_add",
 			in: []Token{
@@ -37,10 +37,10 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T: E_OP, 
-					Value: BO_ADD, 
-					Left: &Expression{T: E_LIT, Value: 6},
-					Right: &Expression{T: E_LIT, Value: 7},
+					T:     E_OP,
+					Value: BO_ADD,
+					Left:  &Expression{T: E_LIT, Value: int64(6)},
+					Right: &Expression{T: E_LIT, Value: int64(7)},
 				},
 			},
 		},
@@ -56,14 +56,14 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T: E_OP, 
-					Value: BO_ADD, 
-					Left: &Expression{T: E_LIT, Value: 6},
+					T:     E_OP,
+					Value: BO_ADD,
+					Left:  &Expression{T: E_LIT, Value: int64(6)},
 					Right: &Expression{
-						T: E_OP,
+						T:     E_OP,
 						Value: BO_MULT,
-						Left: &Expression{T: E_LIT, Value: 7},
-						Right: &Expression{T: E_LIT, Value: 9},
+						Left:  &Expression{T: E_LIT, Value: int64(7)},
+						Right: &Expression{T: E_LIT, Value: int64(9)},
 					},
 				},
 			},
@@ -80,18 +80,18 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T: E_OP, 
-					Value: BO_ADD, 
+					T:     E_OP,
+					Value: BO_ADD,
 					Left: &Expression{
-						T: E_OP,
+						T:     E_OP,
 						Value: BO_MULT,
-						Left: &Expression{T: E_LIT, Value: 6},
-						Right: &Expression{T: E_LIT, Value: 7},
+						Left:  &Expression{T: E_LIT, Value: int64(6)},
+						Right: &Expression{T: E_LIT, Value: int64(7)},
 					},
-					Right: &Expression{T: E_LIT, Value: 9},
+					Right: &Expression{T: E_LIT, Value: int64(9)},
 				},
 			},
-		},	
+		},
 	}
 
 	for _, tst := range tests {

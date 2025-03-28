@@ -7,12 +7,12 @@ import (
 )
 
 func TestTokenise(t *testing.T) {
-	var tests = []struct{
-		in string
+	var tests = []struct {
+		in   string
 		want []Token
 	}{
 		{
-			in: "",
+			in:   "",
 			want: nil,
 		},
 		{
@@ -20,7 +20,7 @@ func TestTokenise(t *testing.T) {
 			want: []Token{
 				{T_INT, "4"},
 			},
-		},		
+		},
 		{
 			in: "4;",
 			want: []Token{

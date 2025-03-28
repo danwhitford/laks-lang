@@ -134,7 +134,7 @@ func op_token_to_binary_op(t TokenType) BinaryOperator {
 
 func (p *parser) parse_literal() (Expression, error) {
 	t := p.read()
-	d, err := strconv.Atoi(t.Lexeme)
+	d, err := strconv.ParseInt(t.Lexeme, 10, 64)
 	if err != nil {
 		return Expression{}, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
 	}
