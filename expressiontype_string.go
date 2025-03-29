@@ -10,11 +10,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[E_LIT-0]
 	_ = x[E_BINOP-1]
+	_ = x[E_PRINT-2]
 }
 
-const _ExpressionType_name = "E_LITE_OP"
+const _ExpressionType_name = "E_LITE_BINOPE_PRINT"
 
-var _ExpressionType_index = [...]uint8{0, 5, 9}
+var _ExpressionType_index = [...]uint8{0, 5, 12, 19}
 
 func (i ExpressionType) String() string {
 	if i >= ExpressionType(len(_ExpressionType_index)-1) {

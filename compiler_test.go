@@ -42,6 +42,30 @@ func TestCompile(t *testing.T) {
 				byte(OP_ADD),
 			},
 		},
+		{
+			name: "print expression",
+			in: []Expression{
+				{
+					T: E_PRINT,
+					Value: Expression{
+						T: E_BINOP,
+						Value: BinaryExpression{
+							BO_MULT,
+							Expression{E_LIT, int64(7)},
+							Expression{E_LIT, int64(8)},
+						},
+					},
+				},
+			},
+			want: []byte{
+				byte(OP_PUSH),
+				7, 0, 0, 0, 0, 0, 0, 0, // 14
+				byte(OP_PUSH),
+				8, 0, 0, 0, 0, 0, 0, 0, // 14
+				byte(OP_MULT),
+				byte(OP_PRINT),
+			},
+		},
 	}
 
 	for _, tst := range tests {

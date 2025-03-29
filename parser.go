@@ -64,6 +64,8 @@ func (p *parser) parse_statement() (Expression, error) {
 	switch t.T {
 	case T_INT:
 		stmt, err = p.parse_expression()
+	case T_KEYWORD:
+		stmt, err = p.parse_keyword()
 	default:
 		return Expression{}, fmt.Errorf("do not know how to handle '%#v'", t)
 	}
@@ -74,6 +76,20 @@ func (p *parser) parse_statement() (Expression, error) {
 
 	err = p.consume(T_SEMI)
 	return stmt, err
+}
+
+func (p *parser) parse_keyword() (Expression, error) {
+	kwd := p.read()
+	switch kwd.Lexeme {
+	case "print":
+		expr, err := p.parse_expression()
+		if err != nil {
+			return Expression{}, err
+		}
+		return Expression{E_PRINT, expr}, nil
+	default:
+		return Expression{}, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
+	}
 }
 
 func (p *parser) parse_expression() (Expression, error) {
