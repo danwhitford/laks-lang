@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+//go:generate stringer -type=OpCode 
 type OpCode byte
 
 const (
@@ -36,29 +37,29 @@ func compile_expr(expr Expression) ([]byte, error) {
 }
 
 func compile_binary_op(expr Expression) ([]byte, error) {
-
 	var bytecode []byte
-	left, err := compile_expr(*expr.Left)
+
+	bexpr, ok := expr.Value.(BinaryExpression)
+	if !ok {
+		return bytecode, fmt.Errorf("failed to convert '%v' to a BinaryExpression", expr)
+	}
+	left, err := compile_expr(bexpr.Left)
 	if err != nil {
 		return bytecode, err
 	}
 	bytecode = append(bytecode, left...)
-	right, err := compile_expr(*expr.Right)
+	right, err := compile_expr(bexpr.Right)
 	if err != nil {
 		return bytecode, err
 	}
 	bytecode = append(bytecode, right...)
 
 	var op OpCode
-	operator, ok := expr.Value.(BinaryOperator)
-	if !ok {
-		return nil, fmt.Errorf("expr '%v' did not have a valid BinaryOperator", expr)
-	}
-	switch operator {
+	switch bexpr.Operator {
 	case BO_ADD:
 		op = OP_ADD
 	default:
-		return nil, fmt.Errorf("dunno how to handle '%v'", operator)
+		return nil, fmt.Errorf("dunno how to handle '%v'", bexpr.Operator)
 	}
 
 	return append(bytecode, byte(op)), nil

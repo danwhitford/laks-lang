@@ -26,10 +26,12 @@ func TestCompile(t *testing.T) {
 			name: "expradd",
 			in: []Expression{
 				{
-					T:     E_OP,
-					Value: BO_ADD,
-					Left:  &Expression{T: E_LIT, Value: int64(7)},
-					Right: &Expression{T: E_LIT, Value: int64(9)},
+					T: E_OP,
+					Value: BinaryExpression{
+						BO_ADD,
+						Expression{T: E_LIT, Value: int64(7)},
+						Expression{T: E_LIT, Value: int64(9)},
+					},
 				},
 			},
 			want: []byte{

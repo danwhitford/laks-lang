@@ -26,8 +26,12 @@ const (
 type Expression struct {
 	T     ExpressionType
 	Value any
-	Left  *Expression
-	Right *Expression
+}
+
+type BinaryExpression struct {
+	Operator BinaryOperator
+	Left     Expression
+	Right    Expression
 }
 
 func Parse(tokens []Token) ([]Expression, error) {
@@ -83,11 +87,10 @@ func (p *parser) parse_expression() (Expression, error) {
 		if err != nil {
 			return r, nil
 		}
+		bexpr := BinaryExpression{op, Expression{expr.T, expr.Value}, r}
 		expr = Expression{
 			E_OP,
-			op,
-			&Expression{expr.T, expr.Value, expr.Left, expr.Right},
-			&r,
+			bexpr,
 		}
 	}
 
@@ -106,11 +109,10 @@ func (p *parser) parse_expression2() (Expression, error) {
 		if err != nil {
 			return r, nil
 		}
+		bexpr := BinaryExpression{op, Expression{expr.T, expr.Value}, r}
 		expr = Expression{
 			E_OP,
-			op,
-			&Expression{expr.T, expr.Value, expr.Left, expr.Right},
-			&r,
+			bexpr,
 		}
 	}
 

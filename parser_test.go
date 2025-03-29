@@ -38,9 +38,7 @@ func TestParse(t *testing.T) {
 			want: []Expression{
 				{
 					T:     E_OP,
-					Value: BO_ADD,
-					Left:  &Expression{T: E_LIT, Value: int64(6)},
-					Right: &Expression{T: E_LIT, Value: int64(7)},
+					Value: BinaryExpression{BO_ADD, Expression{T: E_LIT, Value: int64(6)}, Expression{T: E_LIT, Value: int64(7)}},
 				},
 			},
 		},
@@ -56,14 +54,18 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T:     E_OP,
-					Value: BO_ADD,
-					Left:  &Expression{T: E_LIT, Value: int64(6)},
-					Right: &Expression{
-						T:     E_OP,
-						Value: BO_MULT,
-						Left:  &Expression{T: E_LIT, Value: int64(7)},
-						Right: &Expression{T: E_LIT, Value: int64(9)},
+					T: E_OP,
+					Value: BinaryExpression{
+						BO_ADD,
+						Expression{T: E_LIT, Value: int64(6)},
+						Expression{
+							T: E_OP,
+							Value: BinaryExpression{
+								BO_MULT,
+								Expression{T: E_LIT, Value: int64(7)},
+								Expression{T: E_LIT, Value: int64(9)},
+							},
+						},
 					},
 				},
 			},
@@ -80,15 +82,19 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T:     E_OP,
-					Value: BO_ADD,
-					Left: &Expression{
-						T:     E_OP,
-						Value: BO_MULT,
-						Left:  &Expression{T: E_LIT, Value: int64(6)},
-						Right: &Expression{T: E_LIT, Value: int64(7)},
+					T: E_OP,
+					Value: BinaryExpression{
+						BO_ADD,
+						Expression{
+							T: E_OP,
+							Value: BinaryExpression{
+								BO_MULT,
+								Expression{T: E_LIT, Value: int64(6)},
+								Expression{T: E_LIT, Value: int64(7)},
+							},
+						},
+						Expression{T: E_LIT, Value: int64(9)},
 					},
-					Right: &Expression{T: E_LIT, Value: int64(9)},
 				},
 			},
 		},
