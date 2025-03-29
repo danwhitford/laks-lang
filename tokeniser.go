@@ -17,6 +17,7 @@ const (
 	T_ADD
 	T_DIV
 	T_MINUS
+	T_KEYWORD
 )
 
 type Token struct {
@@ -53,12 +54,30 @@ func (t *tokeniser) tokenise() error {
 		} else if r == ';' {
 			t.read()
 			t.tokens = append(t.tokens, Token{T_SEMI, string(r)})
+		} else if unicode.IsLetter(r) {
+			t.tokenise_keyword()
 		} else {
 			return fmt.Errorf("cannot tokenise '%c'", r)
 		}
 	}
 
 	return nil
+}
+
+func (t *tokeniser) tokenise_keyword() {
+	var sb strings.Builder
+
+	for t.current < len(t.runes) {
+		r := t.peek()
+
+		if unicode.In(r, unicode.Letter, unicode.Number) {
+			sb.WriteRune(t.read())
+		} else {
+			break
+		}
+	}
+
+	t.tokens = append(t.tokens, Token{T_KEYWORD, sb.String()})
 }
 
 func (t *tokeniser) tokenise_operator() {

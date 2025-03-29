@@ -10,7 +10,8 @@ type ExpressionType byte
 
 const (
 	E_LIT ExpressionType = iota
-	E_OP
+	E_BINOP
+	E_PRINT
 )
 
 //go:generate stringer -type=BinaryOperator
@@ -89,7 +90,7 @@ func (p *parser) parse_expression() (Expression, error) {
 		}
 		bexpr := BinaryExpression{op, Expression{expr.T, expr.Value}, r}
 		expr = Expression{
-			E_OP,
+			E_BINOP,
 			bexpr,
 		}
 	}
@@ -111,7 +112,7 @@ func (p *parser) parse_expression2() (Expression, error) {
 		}
 		bexpr := BinaryExpression{op, Expression{expr.T, expr.Value}, r}
 		expr = Expression{
-			E_OP,
+			E_BINOP,
 			bexpr,
 		}
 	}

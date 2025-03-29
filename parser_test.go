@@ -37,7 +37,7 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T:     E_OP,
+					T:     E_BINOP,
 					Value: BinaryExpression{BO_ADD, Expression{T: E_LIT, Value: int64(6)}, Expression{T: E_LIT, Value: int64(7)}},
 				},
 			},
@@ -54,12 +54,12 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T: E_OP,
+					T: E_BINOP,
 					Value: BinaryExpression{
 						BO_ADD,
 						Expression{T: E_LIT, Value: int64(6)},
 						Expression{
-							T: E_OP,
+							T: E_BINOP,
 							Value: BinaryExpression{
 								BO_MULT,
 								Expression{T: E_LIT, Value: int64(7)},
@@ -82,11 +82,11 @@ func TestParse(t *testing.T) {
 			},
 			want: []Expression{
 				{
-					T: E_OP,
+					T: E_BINOP,
 					Value: BinaryExpression{
 						BO_ADD,
 						Expression{
-							T: E_OP,
+							T: E_BINOP,
 							Value: BinaryExpression{
 								BO_MULT,
 								Expression{T: E_LIT, Value: int64(6)},
@@ -94,6 +94,29 @@ func TestParse(t *testing.T) {
 							},
 						},
 						Expression{T: E_LIT, Value: int64(9)},
+					},
+				},
+			},
+		},
+		{
+			name: "print something",
+			in: []Token{
+				{T_KEYWORD, "print"},
+				{T_INT, "7"},
+				{T_MULT, "*"},
+				{T_INT, "8"},
+				{T_SEMI, ";"},
+			},
+			want: []Expression{
+				{
+					T: E_PRINT,
+					Value: Expression{
+						T: E_BINOP,
+						Value: BinaryExpression{
+							BO_MULT,
+							Expression{E_LIT, int64(7)},
+							Expression{E_LIT, int64(8)},
+						},
 					},
 				},
 			},

@@ -9,7 +9,7 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[E_LIT-0]
-	_ = x[E_OP-1]
+	_ = x[E_BINOP-1]
 }
 
 const _ExpressionType_name = "E_LITE_OP"

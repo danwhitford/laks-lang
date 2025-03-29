@@ -55,6 +55,16 @@ func TestTokenise(t *testing.T) {
 				{T_MULT, "*"},
 			},
 		},
+		{
+			in: "print 7*8;",
+			want: []Token{
+				{T_KEYWORD, "print"},
+				{T_INT, "7"},
+				{T_MULT, "*"},
+				{T_INT, "8"},
+				{T_SEMI, ";"},
+			},
+		},
 	}
 
 	for _, tst := range tests {

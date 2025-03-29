@@ -26,7 +26,7 @@ func TestCompile(t *testing.T) {
 			name: "expradd",
 			in: []Expression{
 				{
-					T: E_OP,
+					T: E_BINOP,
 					Value: BinaryExpression{
 						BO_ADD,
 						Expression{T: E_LIT, Value: int64(7)},

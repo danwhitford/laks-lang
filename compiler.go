@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:generate stringer -type=OpCode 
+//go:generate stringer -type=OpCode
 type OpCode byte
 
 const (
@@ -29,7 +29,7 @@ func compile_expr(expr Expression) ([]byte, error) {
 	switch expr.T {
 	case E_LIT:
 		return compile_lit(expr)
-	case E_OP:
+	case E_BINOP:
 		return compile_binary_op(expr)
 	default:
 		return nil, fmt.Errorf("did not recognise expression type '%v'", expr.T)
