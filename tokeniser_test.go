@@ -69,7 +69,7 @@ func TestTokenise(t *testing.T) {
 
 	for _, tst := range tests {
 		t.Run(tst.in, func(tt *testing.T) {
-			got, err := Tokenise(tst.in)
+			got, err := Tokenise([]byte(tst.in))
 			if err != nil {
 				tt.Fatalf("%s", err.Error())
 			}

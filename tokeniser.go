@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-	"unicode"
 )
 
 //go:generate stringer -type=TokenType
@@ -26,35 +25,34 @@ type Token struct {
 }
 
 type tokeniser struct {
-	runes   []rune
+	src   []byte
 	current int
 	tokens  []Token
 }
 
-func Tokenise(src string) ([]Token, error) {
-	var runes = []rune(src)
-	var t = tokeniser{runes: runes}
+func Tokenise(src []byte) ([]Token, error) {
+	var t = tokeniser{src: src}
 	err := t.tokenise()
 	return t.tokens, err
 }
 
 func (t *tokeniser) tokenise() error {
-	for t.current < len(t.runes) {
+	for t.current < len(t.src) {
 		r := t.peek()
 
-		if unicode.IsSpace(r) {
+		if r < '!' {
 			t.read()
 			continue
 		}
 
-		if unicode.IsDigit(r) {
+		if r >= '0' && r <= '9' {
 			t.tokenise_number()
-		} else if slices.Contains([]rune{'*', '+', '/', '-'}, r) {
+		} else if slices.Contains([]byte{'*', '+', '/', '-'}, r) {
 			t.tokenise_operator()
 		} else if r == ';' {
 			t.read()
 			t.tokens = append(t.tokens, Token{T_SEMI, string(r)})
-		} else if unicode.IsLetter(r) {
+		} else if r >= 'a' && r <= 'z' {
 			t.tokenise_keyword()
 		} else {
 			return fmt.Errorf("cannot tokenise '%c'", r)
@@ -67,11 +65,11 @@ func (t *tokeniser) tokenise() error {
 func (t *tokeniser) tokenise_keyword() {
 	var sb strings.Builder
 
-	for t.current < len(t.runes) {
+	for t.current < len(t.src) {
 		r := t.peek()
-
-		if unicode.In(r, unicode.Letter, unicode.Number) {
-			sb.WriteRune(t.read())
+		
+		if r >= 'a' && r <= 'z' {
+			sb.WriteByte(t.read())
 		} else {
 			break
 		}
@@ -94,18 +92,18 @@ func (t *tokeniser) tokenise_operator() {
 	}
 }
 
-func (t *tokeniser) peek() rune {
-	return t.runes[t.current]
+func (t *tokeniser) peek() byte {
+	return t.src[t.current]
 }
 
 func (t *tokeniser) tokenise_number() {
 	var sb strings.Builder
 
-	for t.current < len(t.runes) {
+	for t.current < len(t.src) {
 		r := t.peek()
 
-		if unicode.IsDigit(r) {
-			sb.WriteRune(t.read())
+		if r >= '0' && r <= '9' {
+			sb.WriteByte(t.read())
 		} else {
 			break
 		}
@@ -114,8 +112,8 @@ func (t *tokeniser) tokenise_number() {
 	t.tokens = append(t.tokens, Token{T_INT, sb.String()})
 }
 
-func (t *tokeniser) read() rune {
-	r := t.runes[t.current]
+func (t *tokeniser) read() byte {
+	r := t.src[t.current]
 	t.current++
 	return r
 }
