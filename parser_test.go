@@ -10,7 +10,7 @@ func TestParse(t *testing.T) {
 	var tests = []struct {
 		name string
 		in   []Token
-		want []Expression
+		want []Statement
 	}{
 		{
 			name: "empty",
@@ -23,8 +23,8 @@ func TestParse(t *testing.T) {
 				{T_INT, "44"},
 				{T_SEMI, ";"},
 			},
-			want: []Expression{
-				{T: E_LIT, Value: int64(44)},
+			want: []Statement{
+				LiteralExpression{44},
 			},
 		},
 		{
@@ -35,11 +35,8 @@ func TestParse(t *testing.T) {
 				{T_INT, "7"},
 				{T_SEMI, ";"},
 			},
-			want: []Expression{
-				{
-					T:     E_BINOP,
-					Value: BinaryExpression{BO_ADD, Expression{T: E_LIT, Value: int64(6)}, Expression{T: E_LIT, Value: int64(7)}},
-				},
+			want: []Statement{
+				BinaryExpression{BO_ADD, LiteralExpression{6}, LiteralExpression{7}},
 			},
 		},
 		{
@@ -52,20 +49,14 @@ func TestParse(t *testing.T) {
 				{T_INT, "9"},
 				{T_SEMI, ";"},
 			},
-			want: []Expression{
-				{
-					T: E_BINOP,
-					Value: BinaryExpression{
-						BO_ADD,
-						Expression{T: E_LIT, Value: int64(6)},
-						Expression{
-							T: E_BINOP,
-							Value: BinaryExpression{
-								BO_MULT,
-								Expression{T: E_LIT, Value: int64(7)},
-								Expression{T: E_LIT, Value: int64(9)},
-							},
-						},
+			want: []Statement{
+				BinaryExpression{
+					BO_ADD,
+					LiteralExpression{6},
+					BinaryExpression{
+						BO_MULT,
+						LiteralExpression{7},
+						LiteralExpression{9},
 					},
 				},
 			},
@@ -80,21 +71,15 @@ func TestParse(t *testing.T) {
 				{T_INT, "9"},
 				{T_SEMI, ";"},
 			},
-			want: []Expression{
-				{
-					T: E_BINOP,
-					Value: BinaryExpression{
-						BO_ADD,
-						Expression{
-							T: E_BINOP,
-							Value: BinaryExpression{
-								BO_MULT,
-								Expression{T: E_LIT, Value: int64(6)},
-								Expression{T: E_LIT, Value: int64(7)},
-							},
-						},
-						Expression{T: E_LIT, Value: int64(9)},
+			want: []Statement{
+				BinaryExpression{
+					BO_ADD,
+					BinaryExpression{
+						BO_MULT,
+						LiteralExpression{6},
+						LiteralExpression{7},
 					},
+					LiteralExpression{9},
 				},
 			},
 		},
@@ -107,16 +92,12 @@ func TestParse(t *testing.T) {
 				{T_INT, "8"},
 				{T_SEMI, ";"},
 			},
-			want: []Expression{
-				{
-					T: E_PRINT,
-					Value: Expression{
-						T: E_BINOP,
-						Value: BinaryExpression{
-							BO_MULT,
-							Expression{E_LIT, int64(7)},
-							Expression{E_LIT, int64(8)},
-						},
+			want: []Statement{
+				PrintStatment{
+					BinaryExpression{
+						BO_MULT,
+						LiteralExpression{7},
+						LiteralExpression{8},
 					},
 				},
 			},

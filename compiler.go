@@ -15,81 +15,54 @@ const (
 	OP_PRINT
 )
 
-func Compile(exprs []Expression) ([]byte, error) {
+func (expr LiteralExpression) Compile() ([]byte, error) {
+	var buf []byte
+	buf = append(buf, byte(OP_PUSH))
+	return binary.Append(buf, binary.LittleEndian, expr.Value)
+}
+
+func (expr BinaryExpression) Compile() ([]byte, error) {
+	var buf []byte
+	left, err := expr.Left.Compile()
+	if err != nil {
+		return buf, err
+	}
+	buf = append(buf, left...)
+	right, err := expr.Right.Compile()
+	if err != nil {
+		return buf, err
+	}
+	buf = append(buf, right...)
+	
+	switch expr.Op {
+	case BO_ADD:
+		buf = append(buf, byte(OP_ADD))
+	case BO_MULT:
+		buf = append(buf, byte(OP_MULT))
+	default:
+		return buf, fmt.Errorf("unknown operator '%v'", expr.Op)
+	}
+
+	return buf, nil	
+}
+
+func (expr PrintStatment) Compile() ([]byte, error) {
+	b, err := expr.Expr.Compile()
+	if err != nil {
+		return b, fmt.Errorf("error compiling expression for printing '%v'. '%v'", expr, err)
+	}	
+	b = append(b, byte(OP_PRINT))
+	return b, nil
+}
+
+func Compile(stmts []Statement) ([]byte, error) {
 	var bytecode []byte
-	for _, expr := range exprs {
-		b, err := compile_expr(expr)
+	for _, stmt := range stmts {
+		b, err := stmt.Compile()
 		if err != nil {
 			return bytecode, err
 		}
 		bytecode = append(bytecode, b...)
 	}
 	return bytecode, nil
-}
-
-func compile_expr(expr Expression) ([]byte, error) {
-	switch expr.T {
-	case E_LIT:
-		return compile_lit(expr)
-	case E_BINOP:
-		return compile_binary_op(expr)
-	case E_PRINT:
-		return compile_print(expr)
-	default:
-		return nil, fmt.Errorf("did not recognise expression type '%v'", expr.T)
-	}
-}
-
-func compile_print(expr Expression) ([]byte, error) {
-	expr2, ok := expr.Value.(Expression)
-	if !ok {
-		return nil, fmt.Errorf("print expression was not an expression '%v'", expr)
-	}
-	b, err := compile_expr(expr2)
-	if err != nil {
-		return b, fmt.Errorf("error compiling expression for printing '%v'. '%v'", expr, err)
-	}
-	b = append(b, byte(OP_PRINT))
-	return b, nil
-}
-
-func compile_binary_op(expr Expression) ([]byte, error) {
-	var bytecode []byte
-
-	bexpr, ok := expr.Value.(BinaryExpression)
-	if !ok {
-		return bytecode, fmt.Errorf("failed to convert '%v' to a BinaryExpression", expr)
-	}
-	left, err := compile_expr(bexpr.Left)
-	if err != nil {
-		return bytecode, err
-	}
-	bytecode = append(bytecode, left...)
-	right, err := compile_expr(bexpr.Right)
-	if err != nil {
-		return bytecode, err
-	}
-	bytecode = append(bytecode, right...)
-
-	var op OpCode
-	switch bexpr.Operator {
-	case BO_ADD:
-		op = OP_ADD
-	case BO_MULT:
-		op = OP_MULT
-	default:
-		return nil, fmt.Errorf("dunno how to handle '%v'", bexpr.Operator)
-	}
-
-	return append(bytecode, byte(op)), nil
-}
-
-func compile_lit(expr Expression) ([]byte, error) {
-	var buf []byte
-	buf = append(buf, byte(OP_PUSH))
-	val, ok := expr.Value.(int64)
-	if !ok {
-		return nil, fmt.Errorf("value of lit expr '%v' was not int64", expr)
-	}
-	return binary.Append(buf, binary.LittleEndian, val)
 }
