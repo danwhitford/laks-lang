@@ -9,13 +9,13 @@ import (
 func TestCompile(t *testing.T) {
 	var tests = []struct {
 		name string
-		in   []Expression
+		in   []Statement
 		want []byte
 	}{
 		{
 			name: "literal",
-			in: []Expression{
-				{T: E_LIT, Value: int64(14)},
+			in: []Statement{
+				LiteralExpression{14},
 			},
 			want: []byte{
 				byte(OP_PUSH),
@@ -24,44 +24,37 @@ func TestCompile(t *testing.T) {
 		},
 		{
 			name: "expradd",
-			in: []Expression{
-				{
-					T: E_BINOP,
-					Value: BinaryExpression{
+			in: []Statement{
+				BinaryExpression{
 						BO_ADD,
-						Expression{T: E_LIT, Value: int64(7)},
-						Expression{T: E_LIT, Value: int64(9)},
+						LiteralExpression{7},
+						LiteralExpression{9},
 					},
-				},
 			},
 			want: []byte{
 				byte(OP_PUSH),
-				7, 0, 0, 0, 0, 0, 0, 0, // 14
+				7, 0, 0, 0, 0, 0, 0, 0, // 7
 				byte(OP_PUSH),
-				9, 0, 0, 0, 0, 0, 0, 0, // 14
+				9, 0, 0, 0, 0, 0, 0, 0, // 9
 				byte(OP_ADD),
 			},
 		},
 		{
 			name: "print expression",
-			in: []Expression{
-				{
-					T: E_PRINT,
-					Value: Expression{
-						T: E_BINOP,
-						Value: BinaryExpression{
-							BO_MULT,
-							Expression{E_LIT, int64(7)},
-							Expression{E_LIT, int64(8)},
-						},
+			in: []Statement{
+				PrintStatment{
+					BinaryExpression{
+						BO_MULT,
+						LiteralExpression{7},
+						LiteralExpression{9},
 					},
 				},
 			},
 			want: []byte{
 				byte(OP_PUSH),
-				7, 0, 0, 0, 0, 0, 0, 0, // 14
+				7, 0, 0, 0, 0, 0, 0, 0, // 7
 				byte(OP_PUSH),
-				8, 0, 0, 0, 0, 0, 0, 0, // 14
+				9, 0, 0, 0, 0, 0, 0, 0, // 9
 				byte(OP_MULT),
 				byte(OP_PRINT),
 			},
