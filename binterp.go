@@ -43,11 +43,30 @@ func (bi *bytecode_interpreter) run() error {
 			bi.print()
 		case byte(OP_ADD):
 			bi.add()
+		case byte(OP_DIV):
+			bi.div()
+		case byte(OP_MINUS):
+			bi.minus()
 		default:
 			return fmt.Errorf("could not decode byte code '%v'", code_id)
 		}
 	}
 	return nil
+}
+
+func (bi *bytecode_interpreter) minus() {
+	a := bi.val_stack.pop()
+	b := bi.val_stack.pop()
+	bi.val_stack.push(b - a)
+}
+
+func (bi *bytecode_interpreter) div() {
+	a := bi.val_stack.pop()
+	b := bi.val_stack.pop()
+	if a == 0 {
+		panic("divide by zero")
+	}
+	bi.val_stack.push(b / a)
 }
 
 func (bi *bytecode_interpreter) add() {

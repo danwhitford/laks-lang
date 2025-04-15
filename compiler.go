@@ -13,6 +13,8 @@ const (
 	OP_ADD
 	OP_MULT
 	OP_PRINT
+	OP_DIV
+	OP_MINUS
 )
 
 func (expr LiteralExpression) Compile() ([]byte, error) {
@@ -39,6 +41,10 @@ func (expr BinaryExpression) Compile() ([]byte, error) {
 		buf = append(buf, byte(OP_ADD))
 	case BO_MULT:
 		buf = append(buf, byte(OP_MULT))
+	case BO_DIV:
+		buf = append(buf, byte(OP_DIV))
+	case BO_MINUS:
+		buf = append(buf, byte(OP_MINUS))
 	default:
 		return buf, fmt.Errorf("unknown operator '%v'", expr.Op)
 	}
