@@ -1,7 +1,7 @@
 package laks
 
 import (
-	"fmt"
+	// "fmt"
 	"io"
 )
 
@@ -10,14 +10,14 @@ func RunBytes(b []byte, w io.Writer) error {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("\t%v\n", tokens)
+	// fmt.Printf("\t%v\n", tokens)
 	exprs, err := Parse(tokens)
 	if err != nil {
 		return err
 	}
-	for _, e := range exprs {
-		fmt.Printf("\t%v\n", e)
-	}
+	// for _, e := range exprs {
+	// 	fmt.Printf("\t%v\n", e)
+	// }
 
 	bytecode, err := Compile(exprs)
 	if err != nil {
