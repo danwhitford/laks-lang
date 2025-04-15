@@ -25,7 +25,7 @@ type Token struct {
 }
 
 type tokeniser struct {
-	src   []byte
+	src     []byte
 	current int
 	tokens  []Token
 }
@@ -54,6 +54,8 @@ func (t *tokeniser) tokenise() error {
 			t.tokens = append(t.tokens, Token{T_SEMI, string(r)})
 		} else if r >= 'a' && r <= 'z' {
 			t.tokenise_keyword()
+		} else if r == '#' {
+			t.eat_comment()
 		} else {
 			return fmt.Errorf("cannot tokenise '%c'", r)
 		}
@@ -62,12 +64,24 @@ func (t *tokeniser) tokenise() error {
 	return nil
 }
 
+func (t *tokeniser) eat_comment() {
+	for t.current < len(t.src) {
+		r := t.peek()
+
+		if r == '\n' {
+			break
+		}
+
+		t.read()
+	}
+}
+
 func (t *tokeniser) tokenise_keyword() {
 	var sb strings.Builder
 
 	for t.current < len(t.src) {
 		r := t.peek()
-		
+
 		if r >= 'a' && r <= 'z' {
 			sb.WriteByte(t.read())
 		} else {

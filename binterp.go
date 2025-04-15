@@ -41,12 +41,19 @@ func (bi *bytecode_interpreter) run() error {
 			bi.mult()
 		case byte(OP_PRINT):
 			bi.print()
+		case byte(OP_ADD):
+			bi.add()
 		default:
 			return fmt.Errorf("could not decode byte code '%v'", code_id)
 		}
 	}
 	return nil
 }
+
+func (bi *bytecode_interpreter) add() {
+	a := bi.val_stack.pop()
+	b := bi.val_stack.pop()
+	bi.val_stack.push(a + b)}
 
 func (bi *bytecode_interpreter) print() {
 	fmt.Fprintf(bi.w, "%v\n", bi.val_stack.pop())
