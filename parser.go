@@ -15,20 +15,28 @@ const (
 	BO_DIV
 )
 
-type Statement interface {
-	Compile() ([]byte, error)
+//go:generate stringer -type=StatementType
+type StatementType byte
+
+const (
+	ST_PRINT StatementType = iota
+	ST_BINEXPR
+	ST_LIT
+)
+
+type Statement struct {
+	T StatementType
+	V any
 }
 
-type Expression Statement
-
 type PrintStatment struct {
-	Expr Expression
+	Expr Statement
 }
 
 type BinaryExpression struct {
-	Op BinaryOperator
-	Left     Expression
-	Right    Expression
+	Op    BinaryOperator
+	Left  Statement
+	Right Statement
 }
 
 type LiteralExpression struct {
@@ -67,11 +75,11 @@ func (p *parser) parse_statement() (Statement, error) {
 	case T_KEYWORD:
 		stmt, err = p.parse_keyword()
 	default:
-		return nil, fmt.Errorf("do not know how to handle '%#v'", t)
+		return stmt, fmt.Errorf("do not know how to handle '%#v'", t)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("error parsing statement. %s", err)
+		return stmt, fmt.Errorf("error parsing statement. %s", err)
 	}
 
 	err = p.consume(T_SEMI)
@@ -84,15 +92,15 @@ func (p *parser) parse_keyword() (Statement, error) {
 	case "print":
 		expr, err := p.parse_expression()
 		if err != nil {
-			return nil, err
+			return Statement{}, err
 		}
-		return PrintStatment{expr}, nil
+		return Statement{ST_PRINT, PrintStatment{expr}}, nil
 	default:
-		return nil, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
+		return Statement{}, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
 	}
 }
 
-func (p *parser) parse_expression() (Expression, error) {
+func (p *parser) parse_expression() (Statement, error) {
 	expr, err := p.parse_expression2()
 	if err != nil {
 		return expr, err
@@ -104,13 +112,13 @@ func (p *parser) parse_expression() (Expression, error) {
 		if err != nil {
 			return r, nil
 		}
-		expr = BinaryExpression{op, expr, r}
+		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
 	}
 
 	return expr, nil
 }
 
-func (p *parser) parse_expression2() (Expression, error) {
+func (p *parser) parse_expression2() (Statement, error) {
 	expr, err := p.parse_literal()
 	if err != nil {
 		return expr, err
@@ -122,7 +130,7 @@ func (p *parser) parse_expression2() (Expression, error) {
 		if err != nil {
 			return r, nil
 		}
-		expr = BinaryExpression{op, expr, r}
+		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
 	}
 
 	return expr, nil
@@ -143,13 +151,13 @@ func op_token_to_binary_op(t TokenType) BinaryOperator {
 	}
 }
 
-func (p *parser) parse_literal() (Expression, error) {
+func (p *parser) parse_literal() (Statement, error) {
 	t := p.read()
 	d, err := strconv.ParseInt(t.Lexeme, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
+		return Statement{}, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
 	}
-	return LiteralExpression{d}, nil
+	return Statement{ST_LIT, LiteralExpression{int64(d)}}, nil
 }
 
 func (p *parser) consume(T TokenType) error {

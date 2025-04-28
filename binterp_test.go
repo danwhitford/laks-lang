@@ -46,7 +46,7 @@ func Test_VM(t *testing.T) {
 func TestStac(t *testing.T) {
 	var s stack
 	var i int64
-	for i=range 5 {
+	for i = range 5 {
 		s.push(i)
 	}
 

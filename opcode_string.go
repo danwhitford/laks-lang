@@ -12,11 +12,13 @@ func _() {
 	_ = x[OP_ADD-1]
 	_ = x[OP_MULT-2]
 	_ = x[OP_PRINT-3]
+	_ = x[OP_DIV-4]
+	_ = x[OP_MINUS-5]
 }
 
-const _OpCode_name = "OP_PUSHOP_ADDOP_MULTOP_PRINT"
+const _OpCode_name = "OP_PUSHOP_ADDOP_MULTOP_PRINTOP_DIVOP_MINUS"
 
-var _OpCode_index = [...]uint8{0, 7, 13, 20, 28}
+var _OpCode_index = [...]uint8{0, 7, 13, 20, 28, 34, 42}
 
 func (i OpCode) String() string {
 	if i >= OpCode(len(_OpCode_index)-1) {

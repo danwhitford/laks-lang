@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				LiteralExpression{44},
+				Statement{ST_LIT, LiteralExpression{44}},
 			},
 		},
 		{
@@ -36,7 +36,11 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				BinaryExpression{BO_ADD, LiteralExpression{6}, LiteralExpression{7}},
+				Statement{ST_BINEXPR, BinaryExpression{
+					BO_ADD,
+					Statement{ST_LIT, LiteralExpression{6}},
+					Statement{ST_LIT, LiteralExpression{7}},
+				}},
 			},
 		},
 		{
@@ -50,15 +54,15 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				BinaryExpression{
+				Statement{ST_BINEXPR, BinaryExpression{
 					BO_ADD,
-					LiteralExpression{6},
-					BinaryExpression{
+					Statement{ST_LIT, LiteralExpression{6}},
+					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						LiteralExpression{7},
-						LiteralExpression{9},
-					},
-				},
+						Statement{ST_LIT, LiteralExpression{7}},
+						Statement{ST_LIT, LiteralExpression{9}},
+					}},
+				}},
 			},
 		},
 		{
@@ -72,15 +76,15 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				BinaryExpression{
+				Statement{ST_BINEXPR, BinaryExpression{
 					BO_ADD,
-					BinaryExpression{
+					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						LiteralExpression{6},
-						LiteralExpression{7},
-					},
-					LiteralExpression{9},
-				},
+						Statement{ST_LIT, LiteralExpression{6}},
+						Statement{ST_LIT, LiteralExpression{7}},
+					}},
+					Statement{ST_LIT, LiteralExpression{9}},
+				}},
 			},
 		},
 		{
@@ -93,13 +97,13 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				PrintStatment{
-					BinaryExpression{
+				Statement{ST_PRINT, PrintStatment{
+					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						LiteralExpression{7},
-						LiteralExpression{8},
-					},
-				},
+						Statement{ST_LIT, LiteralExpression{7}},
+						Statement{ST_LIT, LiteralExpression{8}},
+					}},
+				}},
 			},
 		},
 	}

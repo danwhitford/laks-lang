@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var f *os.File
-	
+
 	if len(os.Args) > 1 {
 		fname := os.Args[1]
 		var err error
@@ -20,7 +20,7 @@ func main() {
 	} else {
 		f = os.Stdin
 	}
-	
+
 	b, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)

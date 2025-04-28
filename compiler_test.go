@@ -15,7 +15,10 @@ func TestCompile(t *testing.T) {
 		{
 			name: "literal",
 			in: []Statement{
-				LiteralExpression{14},
+				Statement{
+					T: ST_LIT,
+					V: LiteralExpression{14},
+				},
 			},
 			want: []byte{
 				byte(OP_PUSH),
@@ -25,11 +28,20 @@ func TestCompile(t *testing.T) {
 		{
 			name: "expradd",
 			in: []Statement{
-				BinaryExpression{
-						BO_ADD,
-						LiteralExpression{7},
-						LiteralExpression{9},
+				Statement{
+					T: ST_BINEXPR,
+					V: BinaryExpression{
+						Op: BO_ADD,
+						Left: Statement{
+							T: ST_LIT,
+							V: LiteralExpression{7},
+						},
+						Right: Statement{
+							T: ST_LIT,
+							V: LiteralExpression{9},
+						},
 					},
+				},
 			},
 			want: []byte{
 				byte(OP_PUSH),
@@ -42,11 +54,23 @@ func TestCompile(t *testing.T) {
 		{
 			name: "print expression",
 			in: []Statement{
-				PrintStatment{
-					BinaryExpression{
-						BO_MULT,
-						LiteralExpression{7},
-						LiteralExpression{9},
+				Statement{
+					T: ST_PRINT,
+					V: PrintStatment{
+						Expr: Statement{
+							T: ST_BINEXPR,
+							V: BinaryExpression{
+								Op: BO_MULT,
+								Left: Statement{
+									T: ST_LIT,
+									V: LiteralExpression{7},
+								},
+								Right: Statement{
+									T: ST_LIT,
+									V: LiteralExpression{9},
+								},
+							},
+						},
 					},
 				},
 			},

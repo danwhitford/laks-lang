@@ -72,7 +72,8 @@ func (bi *bytecode_interpreter) div() {
 func (bi *bytecode_interpreter) add() {
 	a := bi.val_stack.pop()
 	b := bi.val_stack.pop()
-	bi.val_stack.push(a + b)}
+	bi.val_stack.push(a + b)
+}
 
 func (bi *bytecode_interpreter) print() {
 	fmt.Fprintf(bi.w, "%v\n", bi.val_stack.pop())
