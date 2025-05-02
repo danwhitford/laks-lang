@@ -13,6 +13,7 @@ const (
 	BO_MINUS
 	BO_MULT
 	BO_DIV
+	BO_EQ
 )
 
 //go:generate stringer -type=StatementType
@@ -40,7 +41,7 @@ type BinaryExpression struct {
 }
 
 type LiteralExpression struct {
-	Value int64
+	Value Value
 }
 
 func Parse(tokens []Token) ([]Statement, error) {
@@ -71,7 +72,7 @@ func (p *parser) parse_statement() (Statement, error) {
 	var err error
 	switch t.T {
 	case T_INT:
-		stmt, err = p.parse_expression()
+		stmt, err = p.parse_bools()
 	case T_KEYWORD:
 		stmt, err = p.parse_keyword()
 	default:
@@ -83,6 +84,9 @@ func (p *parser) parse_statement() (Statement, error) {
 	}
 
 	err = p.consume(T_SEMI)
+	if err != nil {
+		err = fmt.Errorf("error parsing statement. %v", err)
+	}
 	return stmt, err
 }
 
@@ -90,7 +94,7 @@ func (p *parser) parse_keyword() (Statement, error) {
 	kwd := p.read()
 	switch kwd.Lexeme {
 	case "print":
-		expr, err := p.parse_expression()
+		expr, err := p.parse_bools()
 		if err != nil {
 			return Statement{}, err
 		}
@@ -98,6 +102,24 @@ func (p *parser) parse_keyword() (Statement, error) {
 	default:
 		return Statement{}, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
 	}
+}
+
+func (p *parser) parse_bools() (Statement, error) {
+	expr, err := p.parse_expression()
+	if err != nil {
+		return expr, err
+	}
+	for p.peek().T == T_EQ_EQ {
+		op_token := p.read()
+		op := op_token_to_binary_op(op_token.T)
+		r, err := p.parse_expression()
+		if err != nil {
+			return r, nil
+		}
+		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
+	}
+
+	return expr, nil
 }
 
 func (p *parser) parse_expression() (Statement, error) {
@@ -136,6 +158,29 @@ func (p *parser) parse_expression2() (Statement, error) {
 	return expr, nil
 }
 
+func (p *parser) parse_literal() (Statement, error) {
+	t := p.read()
+	switch t.T {
+	case T_INT:
+		d, err := strconv.ParseInt(t.Lexeme, 10, 64)
+		if err != nil {
+			return Statement{}, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
+		}
+		return Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(d)}}}, nil
+	case T_KEYWORD:
+		switch t.Lexeme {
+		case "true":
+			return Statement{ST_LIT, LiteralExpression{Value{VAL_TRUE, true}}}, nil
+		case "false":
+			return Statement{ST_LIT, LiteralExpression{Value{VAL_FALSE, false}}}, nil
+		default:
+			return Statement{}, fmt.Errorf("could not parse literal as keyword '%#v'", t)
+		}
+	default:
+		return Statement{}, fmt.Errorf("could not parse literal '%#v'", t)
+	}
+}
+
 func op_token_to_binary_op(t TokenType) BinaryOperator {
 	switch t {
 	case T_ADD:
@@ -146,18 +191,11 @@ func op_token_to_binary_op(t TokenType) BinaryOperator {
 		return BO_MINUS
 	case T_MULT:
 		return BO_MULT
+	case T_EQ_EQ:
+		return BO_EQ
 	default:
 		panic("what is this '" + t.String() + "'")
 	}
-}
-
-func (p *parser) parse_literal() (Statement, error) {
-	t := p.read()
-	d, err := strconv.ParseInt(t.Lexeme, 10, 64)
-	if err != nil {
-		return Statement{}, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
-	}
-	return Statement{ST_LIT, LiteralExpression{int64(d)}}, nil
 }
 
 func (p *parser) consume(T TokenType) error {

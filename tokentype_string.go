@@ -15,11 +15,13 @@ func _() {
 	_ = x[T_DIV-4]
 	_ = x[T_MINUS-5]
 	_ = x[T_KEYWORD-6]
+	_ = x[T_EQ-7]
+	_ = x[T_EQ_EQ-8]
 }
 
-const _TokenType_name = "T_INTT_SEMIT_MULTT_ADDT_DIVT_MINUST_KEYWORD"
+const _TokenType_name = "T_INTT_SEMIT_MULTT_ADDT_DIVT_MINUST_KEYWORDT_EQT_EQ_EQ"
 
-var _TokenType_index = [...]uint8{0, 5, 11, 17, 22, 27, 34, 43}
+var _TokenType_index = [...]uint8{0, 5, 11, 17, 22, 27, 34, 43, 47, 54}
 
 func (i TokenType) String() string {
 	if i >= TokenType(len(_TokenType_index)-1) {

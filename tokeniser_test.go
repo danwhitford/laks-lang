@@ -85,6 +85,20 @@ func TestTokenise(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 		},
+		{
+			in: "==",
+			want: []Token{
+				{T_EQ_EQ, "=="},
+			},
+		},
+		{
+			in: "true == false",
+			want: []Token{
+				{T_KEYWORD, "true"},
+				{T_EQ_EQ, "=="},
+				{T_KEYWORD, "false"},
+			},
+		},
 	}
 
 	for _, tst := range tests {
