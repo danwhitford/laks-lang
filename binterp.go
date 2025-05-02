@@ -6,13 +6,23 @@ import (
 	"io"
 )
 
-type stack []int64
+//go:generate stringer -type=ValueType
+type ValueType byte
+const (
+	VAL_INT ValueType = iota
+)
+type Value struct {
+	T ValueType
+	Val any
+}
 
-func (s *stack) push(i int64) {
+type stack []Value
+
+func (s *stack) push(i Value) {
 	*s = append(*s, i)
 }
 
-func (s *stack) pop() int64 {
+func (s *stack) pop() Value {
 	v := (*s)[len((*s))-1]
 	newlength := int(len(*s) - 1)
 	*s = (*s)[:newlength]
@@ -54,45 +64,73 @@ func (bi *bytecode_interpreter) run() error {
 	return nil
 }
 
+func checkType(want, got ValueType) {
+	if want != got {
+		panic(fmt.Sprintf("Wanted '%v' but got '%v'", want, got))
+	}
+}
+
 func (bi *bytecode_interpreter) minus() {
 	a := bi.val_stack.pop()
+	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	bi.val_stack.push(b - a)
+	checkType(VAL_INT, b.T)
+	bi.val_stack.push(Value{VAL_INT, b.Val.(int64) - a.Val.(int64)})
 }
 
 func (bi *bytecode_interpreter) div() {
 	a := bi.val_stack.pop()
+	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	if a == 0 {
+	checkType(VAL_INT, b.T)	
+	if a.Val.(int64) == 0 {
 		panic("divide by zero")
 	}
-	bi.val_stack.push(b / a)
+	bi.val_stack.push(Value{VAL_INT, b.Val.(int64) / a.Val.(int64)})
 }
 
 func (bi *bytecode_interpreter) add() {
 	a := bi.val_stack.pop()
+	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	bi.val_stack.push(a + b)
+	checkType(VAL_INT, b.T)
+	bi.val_stack.push(Value{VAL_INT, a.Val.(int64) + b.Val.(int64)})
 }
 
 func (bi *bytecode_interpreter) print() {
-	fmt.Fprintf(bi.w, "%v\n", bi.val_stack.pop())
+	v := bi.val_stack.pop()
+	switch v.T {
+	case VAL_INT:
+		fmt.Fprintf(bi.w, "%v\n", v.Val)
+	default:
+		fmt.Fprintf(bi.w, "%v\n", v)
+
+	}
 }
 
 func (bi *bytecode_interpreter) mult() {
 	a := bi.val_stack.pop()
+	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	bi.val_stack.push(a * b)
+	checkType(VAL_INT, b.T)
+	bi.val_stack.push(Value{VAL_INT, a.Val.(int64) * b.Val.(int64)})
 }
 
 func (bi *bytecode_interpreter) push_val() {
-	var d int64
-	read, err := binary.Decode(bi.bytecode[bi.ip:], binary.LittleEndian, &d)
-	if err != nil {
-		panic(err)
+	val_byte := bi.read()
+	switch val_byte {
+	case byte(VAL_INT):
+		var d int64
+		read, err := binary.Decode(bi.bytecode[bi.ip:], binary.LittleEndian, &d)
+		if err != nil {
+			panic(err)
+		}
+		bi.ip += read
+		bi.val_stack = append(bi.val_stack, Value{VAL_INT, d})
+	default:
+		panic(fmt.Sprintf("Could not convert '%v' to ValueType", val_byte))
 	}
-	bi.ip += read
-	bi.val_stack = append(bi.val_stack, d)
+
 }
 
 func (bi *bytecode_interpreter) read() byte {

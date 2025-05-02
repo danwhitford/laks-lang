@@ -22,6 +22,7 @@ func TestCompile(t *testing.T) {
 			},
 			want: []byte{
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				14, 0, 0, 0, 0, 0, 0, 0, // 14
 			},
 		},
@@ -45,8 +46,10 @@ func TestCompile(t *testing.T) {
 			},
 			want: []byte{
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				7, 0, 0, 0, 0, 0, 0, 0, // 7
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				9, 0, 0, 0, 0, 0, 0, 0, // 9
 				byte(OP_ADD),
 			},
@@ -76,7 +79,9 @@ func TestCompile(t *testing.T) {
 			},
 			want: []byte{
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				7, 0, 0, 0, 0, 0, 0, 0, // 7
+				byte(VAL_INT),
 				byte(OP_PUSH),
 				9, 0, 0, 0, 0, 0, 0, 0, // 9
 				byte(OP_MULT),

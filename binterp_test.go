@@ -17,8 +17,10 @@ func Test_VM(t *testing.T) {
 			name: "print a product",
 			in: []byte{
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				7, 0, 0, 0, 0, 0, 0, 0, // 14
 				byte(OP_PUSH),
+				byte(VAL_INT),
 				8, 0, 0, 0, 0, 0, 0, 0, // 14
 				byte(OP_MULT),
 				byte(OP_PRINT),
@@ -47,22 +49,22 @@ func TestStac(t *testing.T) {
 	var s stack
 	var i int64
 	for i = range 5 {
-		s.push(i)
+		s.push(Value{Val: i})
 	}
 
-	if s.pop() != 4 {
+	if s.pop().Val.(int64) != 4 {
 		t.Errorf("ohno")
 	}
-	if s.pop() != 3 {
+	if s.pop().Val.(int64) != 3 {
 		t.Errorf("ohno")
 	}
-	if s.pop() != 2 {
+	if s.pop().Val.(int64) != 2 {
 		t.Errorf("ohno")
 	}
-	if s.pop() != 1 {
+	if s.pop().Val.(int64) != 1 {
 		t.Errorf("ohno")
 	}
-	if s.pop() != 0 {
+	if s.pop().Val.(int64) != 0 {
 		t.Errorf("ohno")
 	}
 }

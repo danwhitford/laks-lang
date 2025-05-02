@@ -19,6 +19,7 @@ const (
 
 func compileLiteralExpression(expr LiteralExpression) ([]byte, error) {
 	var buf []byte
+	buf = append(buf, byte(VAL_INT))
 	buf = append(buf, byte(OP_PUSH))
 	return binary.Append(buf, binary.LittleEndian, expr.Value)
 }
