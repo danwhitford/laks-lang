@@ -8,11 +8,15 @@ import (
 
 //go:generate stringer -type=ValueType
 type ValueType byte
+
 const (
 	VAL_INT ValueType = iota
+	VAL_TRUE
+	VAL_FALSE
 )
+
 type Value struct {
-	T ValueType
+	T   ValueType
 	Val any
 }
 
@@ -57,6 +61,8 @@ func (bi *bytecode_interpreter) run() error {
 			bi.div()
 		case byte(OP_MINUS):
 			bi.minus()
+		case byte(OP_EQ):
+			bi.eq()
 		default:
 			return fmt.Errorf("could not decode byte code '%v'", code_id)
 		}
@@ -82,7 +88,7 @@ func (bi *bytecode_interpreter) div() {
 	a := bi.val_stack.pop()
 	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)	
+	checkType(VAL_INT, b.T)
 	if a.Val.(int64) == 0 {
 		panic("divide by zero")
 	}
@@ -102,6 +108,10 @@ func (bi *bytecode_interpreter) print() {
 	switch v.T {
 	case VAL_INT:
 		fmt.Fprintf(bi.w, "%v\n", v.Val)
+	case VAL_TRUE:
+		fmt.Fprintln(bi.w, "true")
+	case VAL_FALSE:
+		fmt.Fprintln(bi.w, "false")
 	default:
 		fmt.Fprintf(bi.w, "%v\n", v)
 
@@ -116,6 +126,18 @@ func (bi *bytecode_interpreter) mult() {
 	bi.val_stack.push(Value{VAL_INT, a.Val.(int64) * b.Val.(int64)})
 }
 
+func (bi *bytecode_interpreter) eq() {
+	a := bi.val_stack.pop()
+	checkType(VAL_INT, a.T)
+	b := bi.val_stack.pop()
+	checkType(VAL_INT, b.T)
+	if a == b {
+		bi.val_stack.push(Value{VAL_TRUE, true})
+	} else {
+		bi.val_stack.push(Value{VAL_FALSE, false})
+	}
+}
+
 func (bi *bytecode_interpreter) push_val() {
 	val_byte := bi.read()
 	switch val_byte {
@@ -127,6 +149,10 @@ func (bi *bytecode_interpreter) push_val() {
 		}
 		bi.ip += read
 		bi.val_stack = append(bi.val_stack, Value{VAL_INT, d})
+	case byte(VAL_TRUE):
+		bi.val_stack = append(bi.val_stack, Value{VAL_TRUE, true})
+	case byte(VAL_FALSE):
+		bi.val_stack = append(bi.val_stack, Value{VAL_FALSE, false})
 	default:
 		panic(fmt.Sprintf("Could not convert '%v' to ValueType", val_byte))
 	}

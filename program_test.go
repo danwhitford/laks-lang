@@ -24,10 +24,10 @@ func TestPrograms(t *testing.T) {
 			continue
 		}
 
-		t.Run(program.Name(), func(t *testing.T) {
+		t.Run(program.Name(), func(tt *testing.T) {
 			b, err := f.ReadFile("programs/" + program.Name())
 			if err != nil {
-				t.Fatalf("could not read file %s: %v", program.Name(), err)
+				tt.Fatalf("could not read file %s: %v", program.Name(), err)
 			}
 
 			var expectedBuf strings.Builder
@@ -44,11 +44,11 @@ func TestPrograms(t *testing.T) {
 			outputBuf := &bytes.Buffer{}
 			err = RunBytes(b, outputBuf)
 			if err != nil {
-				t.Fatalf("could not run program %s: %v", program.Name(), err)
+				tt.Fatalf("could not run program %s: %v", program.Name(), err)
 			}
 
 			if cmp.Diff(expectedBuf.String(), outputBuf.String()) != "" {
-				t.Errorf("output mismatch for program %s:\n%s", program.Name(), cmp.Diff(expectedBuf.String(), outputBuf.String()))
+				tt.Errorf("output mismatch for program %s:\n%s", program.Name(), cmp.Diff(expectedBuf.String(), outputBuf.String()))
 			}
 		})
 	}

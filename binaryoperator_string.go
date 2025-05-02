@@ -12,11 +12,12 @@ func _() {
 	_ = x[BO_MINUS-1]
 	_ = x[BO_MULT-2]
 	_ = x[BO_DIV-3]
+	_ = x[BO_EQ-4]
 }
 
-const _BinaryOperator_name = "BO_ADDBO_MINUSBO_MULTBO_DIV"
+const _BinaryOperator_name = "BO_ADDBO_MINUSBO_MULTBO_DIVBO_EQ"
 
-var _BinaryOperator_index = [...]uint8{0, 6, 14, 21, 27}
+var _BinaryOperator_index = [...]uint8{0, 6, 14, 21, 27, 32}
 
 func (i BinaryOperator) String() string {
 	if i >= BinaryOperator(len(_BinaryOperator_index)-1) {

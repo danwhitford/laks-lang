@@ -17,6 +17,8 @@ const (
 	T_DIV
 	T_MINUS
 	T_KEYWORD
+	T_EQ
+	T_EQ_EQ
 )
 
 type Token struct {
@@ -47,7 +49,7 @@ func (t *tokeniser) tokenise() error {
 
 		if r >= '0' && r <= '9' {
 			t.tokenise_number()
-		} else if slices.Contains([]byte{'*', '+', '/', '-'}, r) {
+		} else if slices.Contains([]byte{'*', '+', '/', '-', '='}, r) {
 			t.tokenise_operator()
 		} else if r == ';' {
 			t.read()
@@ -103,6 +105,13 @@ func (t *tokeniser) tokenise_operator() {
 		t.tokens = append(t.tokens, Token{T_MINUS, string(r)})
 	case '/':
 		t.tokens = append(t.tokens, Token{T_DIV, string(r)})
+	case '=':
+		if t.peek() == '=' {
+			t.read()
+			t.tokens = append(t.tokens, Token{T_EQ_EQ, "=="})
+		} else {
+			t.tokens = append(t.tokens, Token{T_EQ, string(r)})
+		}
 	}
 }
 

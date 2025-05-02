@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_LIT, LiteralExpression{44}},
+				Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(44)}}},
 			},
 		},
 		{
@@ -38,8 +38,8 @@ func TestParse(t *testing.T) {
 			want: []Statement{
 				Statement{ST_BINEXPR, BinaryExpression{
 					BO_ADD,
-					Statement{ST_LIT, LiteralExpression{6}},
-					Statement{ST_LIT, LiteralExpression{7}},
+					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
+					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
 				}},
 			},
 		},
@@ -56,11 +56,11 @@ func TestParse(t *testing.T) {
 			want: []Statement{
 				Statement{ST_BINEXPR, BinaryExpression{
 					BO_ADD,
-					Statement{ST_LIT, LiteralExpression{6}},
+					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
 					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{7}},
-						Statement{ST_LIT, LiteralExpression{9}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(9)}}},
 					}},
 				}},
 			},
@@ -80,10 +80,10 @@ func TestParse(t *testing.T) {
 					BO_ADD,
 					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{6}},
-						Statement{ST_LIT, LiteralExpression{7}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
 					}},
-					Statement{ST_LIT, LiteralExpression{9}},
+					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(9)}}},
 				}},
 			},
 		},
@@ -100,8 +100,8 @@ func TestParse(t *testing.T) {
 				Statement{ST_PRINT, PrintStatment{
 					Statement{ST_BINEXPR, BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{7}},
-						Statement{ST_LIT, LiteralExpression{8}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
+						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(8)}}},
 					}},
 				}},
 			},
