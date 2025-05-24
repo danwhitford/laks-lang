@@ -119,4 +119,16 @@ func TestParse(t *testing.T) {
 			}
 		})
 	}
+
+}
+
+func TestErorrs(t *testing.T) {
+	in := []Token{
+		{T_KEYWORD, "print"},
+		{T_STRING, "foobar!"},
+	}
+	_, err := Parse(in)
+	if err == nil {
+		t.Fatalf("wanted error")
+	}
 }

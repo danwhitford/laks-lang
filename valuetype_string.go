@@ -11,11 +11,12 @@ func _() {
 	_ = x[VAL_INT-0]
 	_ = x[VAL_TRUE-1]
 	_ = x[VAL_FALSE-2]
+	_ = x[VAL_STRING-3]
 }
 
-const _ValueType_name = "VAL_INTVAL_TRUEVAL_FALSE"
+const _ValueType_name = "VAL_INTVAL_TRUEVAL_FALSEVAL_STRING"
 
-var _ValueType_index = [...]uint8{0, 7, 15, 24}
+var _ValueType_index = [...]uint8{0, 7, 15, 24, 34}
 
 func (i ValueType) String() string {
 	if i >= ValueType(len(_ValueType_index)-1) {

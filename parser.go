@@ -176,6 +176,8 @@ func (p *parser) parse_literal() (Statement, error) {
 		default:
 			return Statement{}, fmt.Errorf("could not parse literal as keyword '%#v'", t)
 		}
+	case T_STRING:
+		return Statement{ST_LIT, LiteralExpression{Value{VAL_STRING, t.Lexeme}}}, nil
 	default:
 		return Statement{}, fmt.Errorf("could not parse literal '%#v'", t)
 	}
@@ -199,6 +201,9 @@ func op_token_to_binary_op(t TokenType) BinaryOperator {
 }
 
 func (p *parser) consume(T TokenType) error {
+	if p.curr >= len(p.tokens) {
+		return fmt.Errorf("error consuming. EOF")
+	}
 	t := p.tokens[p.curr]
 	if t.T != T {
 		return fmt.Errorf("error consuming. wanted '%v' but got '%v'", T, t.T)
@@ -208,6 +213,9 @@ func (p *parser) consume(T TokenType) error {
 }
 
 func (p *parser) peek() Token {
+	if p.curr >= len(p.tokens) {
+		return Token{}
+	}
 	return p.tokens[p.curr]
 }
 

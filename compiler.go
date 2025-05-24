@@ -35,6 +35,12 @@ func compileLiteralExpression(expr LiteralExpression) ([]byte, error) {
 	case VAL_FALSE:
 		buf = append(buf, byte(OP_PUSH))
 		buf = append(buf, byte(VAL_FALSE))
+	case VAL_STRING:
+		buf = append(buf, byte(OP_PUSH))
+		buf = append(buf, byte(VAL_STRING))
+		bb := []byte(expr.Value.Val.(string))
+		buf = append(buf, bb...)
+		buf = append(buf, 0)
 	default:
 		return buf, fmt.Errorf("do not know how to compile litexpr '%v'", expr)
 	}

@@ -1,0 +1,8 @@
+# Hello, world!
+print "Hello, world!";
+# true
+print "foo" == "foo";
+# false
+print "foo" == "bar";
+# foobar
+print "foo" + "bar";

@@ -99,6 +99,13 @@ func TestTokenise(t *testing.T) {
 				{T_KEYWORD, "false"},
 			},
 		},
+		{
+			in: "print \"foobar!\"",
+			want: []Token{
+				{T_KEYWORD, "print"},
+				{T_STRING, "foobar!"},
+			},
+		},
 	}
 
 	for _, tst := range tests {

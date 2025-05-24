@@ -19,6 +19,7 @@ const (
 	T_KEYWORD
 	T_EQ
 	T_EQ_EQ
+	T_STRING
 )
 
 type Token struct {
@@ -58,12 +59,31 @@ func (t *tokeniser) tokenise() error {
 			t.tokenise_keyword()
 		} else if r == '#' {
 			t.eat_comment()
+		} else if r == '"' {
+			t.tokenise_string()
 		} else {
 			return fmt.Errorf("cannot tokenise '%c'", r)
 		}
 	}
 
 	return nil
+}
+
+func (t *tokeniser) tokenise_string() {
+	t.read() // The opening quotes
+
+	var sb strings.Builder
+
+	for t.current < len(t.src) {
+		r := t.read()
+		if r == '"' {
+			t.tokens = append(t.tokens, Token{T_STRING, sb.String()})
+			return
+		}
+		sb.WriteByte(r)
+	}
+
+	panic("got to end of file while reading string")
 }
 
 func (t *tokeniser) eat_comment() {

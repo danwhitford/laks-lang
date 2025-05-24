@@ -13,6 +13,7 @@ const (
 	VAL_INT ValueType = iota
 	VAL_TRUE
 	VAL_FALSE
+	VAL_STRING
 )
 
 type Value struct {
@@ -97,16 +98,25 @@ func (bi *bytecode_interpreter) div() {
 
 func (bi *bytecode_interpreter) add() {
 	a := bi.val_stack.pop()
-	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)
-	bi.val_stack.push(Value{VAL_INT, a.Val.(int64) + b.Val.(int64)})
+
+	if a.T != b.T {
+		panic("cannot '+' two different types")
+	}
+
+	switch a.T {
+	case VAL_INT:
+		bi.val_stack.push(Value{VAL_INT, a.Val.(int64) + b.Val.(int64)})
+	case VAL_STRING:
+		bi.val_stack.push(Value{VAL_INT, b.Val.(string) + a.Val.(string)})
+	}
+
 }
 
 func (bi *bytecode_interpreter) print() {
 	v := bi.val_stack.pop()
 	switch v.T {
-	case VAL_INT:
+	case VAL_INT, VAL_STRING:
 		fmt.Fprintf(bi.w, "%v\n", v.Val)
 	case VAL_TRUE:
 		fmt.Fprintln(bi.w, "true")
@@ -128,10 +138,12 @@ func (bi *bytecode_interpreter) mult() {
 
 func (bi *bytecode_interpreter) eq() {
 	a := bi.val_stack.pop()
-	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)
-	if a == b {
+
+	if a.T != b.T {
+		bi.val_stack.push(Value{VAL_FALSE, false})
+		return
+	} else if a == b {
 		bi.val_stack.push(Value{VAL_TRUE, true})
 	} else {
 		bi.val_stack.push(Value{VAL_FALSE, false})
@@ -153,10 +165,19 @@ func (bi *bytecode_interpreter) push_val() {
 		bi.val_stack = append(bi.val_stack, Value{VAL_TRUE, true})
 	case byte(VAL_FALSE):
 		bi.val_stack = append(bi.val_stack, Value{VAL_FALSE, false})
+	case byte(VAL_STRING):
+		var bb []byte
+		for {
+			b := bi.read()
+			if b == 0 {
+				break
+			}
+			bb = append(bb, b)
+		}
+		bi.val_stack = append(bi.val_stack, Value{VAL_STRING, string(bb)})
 	default:
 		panic(fmt.Sprintf("Could not convert '%v' to ValueType", val_byte))
 	}
-
 }
 
 func (bi *bytecode_interpreter) read() byte {
