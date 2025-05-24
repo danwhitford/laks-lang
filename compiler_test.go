@@ -15,7 +15,7 @@ func TestCompile(t *testing.T) {
 		{
 			name: "literal",
 			in: []Statement{
-				LiteralExpression{Value{VAL_INT, int64(14)}},
+				LiteralExpression{IntValue(int64(14))},
 			},
 			want: []byte{
 				byte(OP_PUSH),
@@ -28,8 +28,8 @@ func TestCompile(t *testing.T) {
 			in: []Statement{
 				BinaryExpression{
 					Op:    BO_ADD,
-					Left:  LiteralExpression{Value{VAL_INT, int64(7)}},
-					Right: LiteralExpression{Value{VAL_INT, int64(9)}},
+					Left:  LiteralExpression{IntValue(int64(7))},
+					Right: LiteralExpression{IntValue(int64(9))},
 				},
 			},
 			want: []byte{
@@ -48,8 +48,8 @@ func TestCompile(t *testing.T) {
 				PrintStatment{
 					Expr: BinaryExpression{
 						Op:    BO_MULT,
-						Left:  LiteralExpression{Value{VAL_INT, int64(7)}},
-						Right: LiteralExpression{Value{VAL_INT, int64(9)}},
+						Left:  LiteralExpression{IntValue(int64(7))},
+						Right: LiteralExpression{IntValue(int64(9))},
 					},
 				},
 			},
@@ -68,7 +68,7 @@ func TestCompile(t *testing.T) {
 			name: "simple true",
 			in: []Statement{
 				PrintStatment{
-					Expr: LiteralExpression{Value{VAL_TRUE, true}},
+					Expr: LiteralExpression{TrueValue(true)},
 				},
 			},
 			want: []byte{

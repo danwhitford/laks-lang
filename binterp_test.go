@@ -49,22 +49,22 @@ func TestStac(t *testing.T) {
 	var s stack
 	var i int64
 	for i = range 5 {
-		s.push(Value{Val: i})
+		s.push(IntValue(i))
 	}
 
-	if s.pop().Val.(int64) != 4 {
+	if s.pop().(IntValue) != 4 {
 		t.Errorf("ohno")
 	}
-	if s.pop().Val.(int64) != 3 {
+	if s.pop().(IntValue) != 3 {
 		t.Errorf("ohno")
 	}
-	if s.pop().Val.(int64) != 2 {
+	if s.pop().(IntValue) != 2 {
 		t.Errorf("ohno")
 	}
-	if s.pop().Val.(int64) != 1 {
+	if s.pop().(IntValue) != 1 {
 		t.Errorf("ohno")
 	}
-	if s.pop().Val.(int64) != 0 {
+	if s.pop().(IntValue) != 0 {
 		t.Errorf("ohno")
 	}
 }

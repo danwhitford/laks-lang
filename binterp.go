@@ -16,10 +16,11 @@ const (
 	VAL_STRING
 )
 
-type Value struct {
-	T   ValueType
-	Val any
-}
+type Value any
+type IntValue int64
+type TrueValue bool
+type FalseValue bool
+type StringValue string
 
 type stack []Value
 
@@ -71,56 +72,42 @@ func (bi *bytecode_interpreter) run() error {
 	return nil
 }
 
-func checkType(want, got ValueType) {
-	if want != got {
-		panic(fmt.Sprintf("Wanted '%v' but got '%v'", want, got))
-	}
-}
-
 func (bi *bytecode_interpreter) minus() {
 	a := bi.val_stack.pop()
-	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)
-	bi.val_stack.push(Value{VAL_INT, b.Val.(int64) - a.Val.(int64)})
+	bi.val_stack.push(IntValue(b.(IntValue) - a.(IntValue)))
 }
 
 func (bi *bytecode_interpreter) div() {
 	a := bi.val_stack.pop()
-	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)
-	if a.Val.(int64) == 0 {
+	if a.(IntValue) == 0 {
 		panic("divide by zero")
 	}
-	bi.val_stack.push(Value{VAL_INT, b.Val.(int64) / a.Val.(int64)})
+	bi.val_stack.push(IntValue(b.(IntValue) / a.(IntValue)))
 }
 
 func (bi *bytecode_interpreter) add() {
 	a := bi.val_stack.pop()
 	b := bi.val_stack.pop()
 
-	if a.T != b.T {
-		panic("cannot '+' two different types")
-	}
-
-	switch a.T {
-	case VAL_INT:
-		bi.val_stack.push(Value{VAL_INT, a.Val.(int64) + b.Val.(int64)})
-	case VAL_STRING:
-		bi.val_stack.push(Value{VAL_INT, b.Val.(string) + a.Val.(string)})
+	switch a.(type) {
+	case IntValue:
+		bi.val_stack.push(IntValue(a.(IntValue) + b.(IntValue)))
+	case StringValue:
+		bi.val_stack.push(StringValue(b.(StringValue) + a.(StringValue)))
 	}
 
 }
 
 func (bi *bytecode_interpreter) print() {
 	v := bi.val_stack.pop()
-	switch v.T {
-	case VAL_INT, VAL_STRING:
-		fmt.Fprintf(bi.w, "%v\n", v.Val)
-	case VAL_TRUE:
+	switch v.(type) {
+	case IntValue, StringValue:
+		fmt.Fprintf(bi.w, "%v\n", v)
+	case TrueValue:
 		fmt.Fprintln(bi.w, "true")
-	case VAL_FALSE:
+	case FalseValue:
 		fmt.Fprintln(bi.w, "false")
 	default:
 		fmt.Fprintf(bi.w, "%v\n", v)
@@ -130,23 +117,18 @@ func (bi *bytecode_interpreter) print() {
 
 func (bi *bytecode_interpreter) mult() {
 	a := bi.val_stack.pop()
-	checkType(VAL_INT, a.T)
 	b := bi.val_stack.pop()
-	checkType(VAL_INT, b.T)
-	bi.val_stack.push(Value{VAL_INT, a.Val.(int64) * b.Val.(int64)})
+	bi.val_stack.push(IntValue(a.(IntValue) * b.(IntValue)))
 }
 
 func (bi *bytecode_interpreter) eq() {
 	a := bi.val_stack.pop()
 	b := bi.val_stack.pop()
 
-	if a.T != b.T {
-		bi.val_stack.push(Value{VAL_FALSE, false})
-		return
-	} else if a == b {
-		bi.val_stack.push(Value{VAL_TRUE, true})
+	if a == b {
+		bi.val_stack.push(TrueValue(true))
 	} else {
-		bi.val_stack.push(Value{VAL_FALSE, false})
+		bi.val_stack.push(FalseValue(false))
 	}
 }
 
@@ -160,21 +142,22 @@ func (bi *bytecode_interpreter) push_val() {
 			panic(err)
 		}
 		bi.ip += read
-		bi.val_stack = append(bi.val_stack, Value{VAL_INT, d})
+		bi.val_stack = append(bi.val_stack, IntValue(int64(d)))
 	case byte(VAL_TRUE):
-		bi.val_stack = append(bi.val_stack, Value{VAL_TRUE, true})
+		bi.val_stack = append(bi.val_stack, TrueValue(true))
 	case byte(VAL_FALSE):
-		bi.val_stack = append(bi.val_stack, Value{VAL_FALSE, false})
+		bi.val_stack = append(bi.val_stack, FalseValue(false))
 	case byte(VAL_STRING):
-		var bb []byte
+		start := bi.ip
+		end := start
 		for {
 			b := bi.read()
 			if b == 0 {
 				break
 			}
-			bb = append(bb, b)
+			end++
 		}
-		bi.val_stack = append(bi.val_stack, Value{VAL_STRING, string(bb)})
+		bi.val_stack = append(bi.val_stack, StringValue(string(bi.bytecode[start:end])))
 	default:
 		panic(fmt.Sprintf("Could not convert '%v' to ValueType", val_byte))
 	}

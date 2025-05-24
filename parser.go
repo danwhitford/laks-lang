@@ -154,18 +154,18 @@ func (p *parser) parse_literal() (Statement, error) {
 		if err != nil {
 			return nil, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
 		}
-		return LiteralExpression{Value{VAL_INT, int64(d)}}, nil
+		return LiteralExpression{IntValue(d)}, nil
 	case T_KEYWORD:
 		switch t.Lexeme {
 		case "true":
-			return LiteralExpression{Value{VAL_TRUE, true}}, nil
+			return LiteralExpression{TrueValue(true)}, nil
 		case "false":
-			return LiteralExpression{Value{VAL_FALSE, false}}, nil
+			return LiteralExpression{FalseValue(false)}, nil
 		default:
 			return nil, fmt.Errorf("could not parse literal as keyword '%#v'", t)
 		}
 	case T_STRING:
-		return LiteralExpression{Value{VAL_STRING, t.Lexeme}}, nil
+		return LiteralExpression{StringValue(t.Lexeme)}, nil
 	default:
 		return nil, fmt.Errorf("could not parse literal '%#v'", t)
 	}

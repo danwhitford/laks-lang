@@ -21,24 +21,24 @@ const (
 func compileLiteralExpression(expr LiteralExpression) ([]byte, error) {
 	var buf []byte
 	var err error
-	switch expr.Value.T {
-	case VAL_INT:
+	switch v := expr.Value.(type) {
+	case IntValue:
 		buf = append(buf, byte(VAL_INT))
 		buf = append(buf, byte(OP_PUSH))
-		buf, err = binary.Append(buf, binary.LittleEndian, expr.Value.Val.(int64))
+		buf, err = binary.Append(buf, binary.LittleEndian, v)
 		if err != nil {
 			err = fmt.Errorf("error appending '%#v'. %v", expr.Value, err)
 		}
-	case VAL_TRUE:
+	case TrueValue:
 		buf = append(buf, byte(OP_PUSH))
 		buf = append(buf, byte(VAL_TRUE))
-	case VAL_FALSE:
+	case FalseValue:
 		buf = append(buf, byte(OP_PUSH))
 		buf = append(buf, byte(VAL_FALSE))
-	case VAL_STRING:
+	case StringValue:
 		buf = append(buf, byte(OP_PUSH))
 		buf = append(buf, byte(VAL_STRING))
-		bb := []byte(expr.Value.Val.(string))
+		bb := []byte(v)
 		buf = append(buf, bb...)
 		buf = append(buf, 0)
 	default:

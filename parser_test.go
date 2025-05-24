@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				LiteralExpression{Value{VAL_INT, int64(44)}},
+				LiteralExpression{IntValue(int64(44))},
 			},
 		},
 		{
@@ -38,8 +38,8 @@ func TestParse(t *testing.T) {
 			want: []Statement{
 				BinaryExpression{
 					BO_ADD,
-					LiteralExpression{Value{VAL_INT, int64(6)}},
-					LiteralExpression{Value{VAL_INT, int64(7)}},
+					LiteralExpression{IntValue(int64(6))},
+					LiteralExpression{IntValue(int64(7))},
 				},
 			},
 		},
@@ -56,11 +56,11 @@ func TestParse(t *testing.T) {
 			want: []Statement{
 				BinaryExpression{
 					BO_ADD,
-					LiteralExpression{Value{VAL_INT, int64(6)}},
+					LiteralExpression{IntValue(int64(6))},
 					BinaryExpression{
 						BO_MULT,
-						LiteralExpression{Value{VAL_INT, int64(7)}},
-						LiteralExpression{Value{VAL_INT, int64(9)}},
+						LiteralExpression{IntValue(int64(7))},
+						LiteralExpression{IntValue(int64(9))},
 					},
 				},
 			},
@@ -80,10 +80,10 @@ func TestParse(t *testing.T) {
 					BO_ADD,
 					BinaryExpression{
 						BO_MULT,
-						LiteralExpression{Value{VAL_INT, int64(6)}},
-						LiteralExpression{Value{VAL_INT, int64(7)}},
+						LiteralExpression{IntValue(int64(6))},
+						LiteralExpression{IntValue(int64(7))},
 					},
-					LiteralExpression{Value{VAL_INT, int64(9)}},
+					LiteralExpression{IntValue(int64(9))},
 				},
 			},
 		},
@@ -100,8 +100,8 @@ func TestParse(t *testing.T) {
 				PrintStatment{
 					BinaryExpression{
 						BO_MULT,
-						LiteralExpression{Value{VAL_INT, int64(7)}},
-						LiteralExpression{Value{VAL_INT, int64(8)}},
+						LiteralExpression{IntValue(int64(7))},
+						LiteralExpression{IntValue(int64(8))},
 					},
 				},
 			},
