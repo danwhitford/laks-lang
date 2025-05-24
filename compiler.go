@@ -88,15 +88,15 @@ func compilePrint(p PrintStatment) ([]byte, error) {
 }
 
 func compileStatement(stmt Statement) ([]byte, error) {
-	switch stmt.T {
-	case ST_PRINT:
-		return compilePrint(stmt.V.(PrintStatment))
-	case ST_BINEXPR:
-		return compileBinaryExpression(stmt.V.(BinaryExpression))
-	case ST_LIT:
-		return compileLiteralExpression(stmt.V.(LiteralExpression))
+	switch v := stmt.(type) {
+	case PrintStatment:
+		return compilePrint(v)
+	case BinaryExpression:
+		return compileBinaryExpression(v)
+	case LiteralExpression:
+		return compileLiteralExpression(v)
 	default:
-		return nil, fmt.Errorf("unknown statement type '%v'", stmt.T)
+		return nil, fmt.Errorf("unknown statement type '%T'", v)
 	}
 }
 

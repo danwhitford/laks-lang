@@ -15,10 +15,7 @@ func TestCompile(t *testing.T) {
 		{
 			name: "literal",
 			in: []Statement{
-				Statement{
-					T: ST_LIT,
-					V: LiteralExpression{Value{VAL_INT, int64(14)}},
-				},
+				LiteralExpression{Value{VAL_INT, int64(14)}},
 			},
 			want: []byte{
 				byte(OP_PUSH),
@@ -29,19 +26,10 @@ func TestCompile(t *testing.T) {
 		{
 			name: "expradd",
 			in: []Statement{
-				Statement{
-					T: ST_BINEXPR,
-					V: BinaryExpression{
-						Op: BO_ADD,
-						Left: Statement{
-							T: ST_LIT,
-							V: LiteralExpression{Value{VAL_INT, int64(7)}},
-						},
-						Right: Statement{
-							T: ST_LIT,
-							V: LiteralExpression{Value{VAL_INT, int64(9)}},
-						},
-					},
+				BinaryExpression{
+					Op:    BO_ADD,
+					Left:  LiteralExpression{Value{VAL_INT, int64(7)}},
+					Right: LiteralExpression{Value{VAL_INT, int64(9)}},
 				},
 			},
 			want: []byte{
@@ -57,23 +45,11 @@ func TestCompile(t *testing.T) {
 		{
 			name: "print expression",
 			in: []Statement{
-				Statement{
-					T: ST_PRINT,
-					V: PrintStatment{
-						Expr: Statement{
-							T: ST_BINEXPR,
-							V: BinaryExpression{
-								Op: BO_MULT,
-								Left: Statement{
-									T: ST_LIT,
-									V: LiteralExpression{Value{VAL_INT, int64(7)}},
-								},
-								Right: Statement{
-									T: ST_LIT,
-									V: LiteralExpression{Value{VAL_INT, int64(9)}},
-								},
-							},
-						},
+				PrintStatment{
+					Expr: BinaryExpression{
+						Op:    BO_MULT,
+						Left:  LiteralExpression{Value{VAL_INT, int64(7)}},
+						Right: LiteralExpression{Value{VAL_INT, int64(9)}},
 					},
 				},
 			},
@@ -91,14 +67,8 @@ func TestCompile(t *testing.T) {
 		{
 			name: "simple true",
 			in: []Statement{
-				Statement{
-					T: ST_PRINT,
-					V: PrintStatment{
-						Expr: Statement{
-							T: ST_LIT,
-							V: LiteralExpression{Value{VAL_TRUE, true}},
-						},
-					},
+				PrintStatment{
+					Expr: LiteralExpression{Value{VAL_TRUE, true}},
 				},
 			},
 			want: []byte{

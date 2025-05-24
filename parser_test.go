@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(44)}}},
+				LiteralExpression{Value{VAL_INT, int64(44)}},
 			},
 		},
 		{
@@ -36,11 +36,11 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_BINEXPR, BinaryExpression{
+				BinaryExpression{
 					BO_ADD,
-					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
-					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
-				}},
+					LiteralExpression{Value{VAL_INT, int64(6)}},
+					LiteralExpression{Value{VAL_INT, int64(7)}},
+				},
 			},
 		},
 		{
@@ -54,15 +54,15 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_BINEXPR, BinaryExpression{
+				BinaryExpression{
 					BO_ADD,
-					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
-					Statement{ST_BINEXPR, BinaryExpression{
+					LiteralExpression{Value{VAL_INT, int64(6)}},
+					BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(9)}}},
-					}},
-				}},
+						LiteralExpression{Value{VAL_INT, int64(7)}},
+						LiteralExpression{Value{VAL_INT, int64(9)}},
+					},
+				},
 			},
 		},
 		{
@@ -76,15 +76,15 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_BINEXPR, BinaryExpression{
+				BinaryExpression{
 					BO_ADD,
-					Statement{ST_BINEXPR, BinaryExpression{
+					BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(6)}}},
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
-					}},
-					Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(9)}}},
-				}},
+						LiteralExpression{Value{VAL_INT, int64(6)}},
+						LiteralExpression{Value{VAL_INT, int64(7)}},
+					},
+					LiteralExpression{Value{VAL_INT, int64(9)}},
+				},
 			},
 		},
 		{
@@ -97,13 +97,13 @@ func TestParse(t *testing.T) {
 				{T_SEMI, ";"},
 			},
 			want: []Statement{
-				Statement{ST_PRINT, PrintStatment{
-					Statement{ST_BINEXPR, BinaryExpression{
+				PrintStatment{
+					BinaryExpression{
 						BO_MULT,
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(7)}}},
-						Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(8)}}},
-					}},
-				}},
+						LiteralExpression{Value{VAL_INT, int64(7)}},
+						LiteralExpression{Value{VAL_INT, int64(8)}},
+					},
+				},
 			},
 		},
 	}

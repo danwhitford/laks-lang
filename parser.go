@@ -16,19 +16,7 @@ const (
 	BO_EQ
 )
 
-//go:generate stringer -type=StatementType
-type StatementType byte
-
-const (
-	ST_PRINT StatementType = iota
-	ST_BINEXPR
-	ST_LIT
-)
-
-type Statement struct {
-	T StatementType
-	V any
-}
+type Statement any
 
 type PrintStatment struct {
 	Expr Statement
@@ -96,11 +84,11 @@ func (p *parser) parse_keyword() (Statement, error) {
 	case "print":
 		expr, err := p.parse_bools()
 		if err != nil {
-			return Statement{}, err
+			return nil, err
 		}
-		return Statement{ST_PRINT, PrintStatment{expr}}, nil
+		return PrintStatment{expr}, nil
 	default:
-		return Statement{}, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
+		return nil, fmt.Errorf("do not recognise keyword '%v'", kwd.Lexeme)
 	}
 }
 
@@ -116,7 +104,7 @@ func (p *parser) parse_bools() (Statement, error) {
 		if err != nil {
 			return r, nil
 		}
-		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
+		expr = BinaryExpression{op, expr, r}
 	}
 
 	return expr, nil
@@ -134,7 +122,7 @@ func (p *parser) parse_expression() (Statement, error) {
 		if err != nil {
 			return r, nil
 		}
-		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
+		expr = BinaryExpression{op, expr, r}
 	}
 
 	return expr, nil
@@ -152,7 +140,7 @@ func (p *parser) parse_expression2() (Statement, error) {
 		if err != nil {
 			return r, nil
 		}
-		expr = Statement{ST_BINEXPR, BinaryExpression{op, expr, r}}
+		expr = BinaryExpression{op, expr, r}
 	}
 
 	return expr, nil
@@ -164,22 +152,22 @@ func (p *parser) parse_literal() (Statement, error) {
 	case T_INT:
 		d, err := strconv.ParseInt(t.Lexeme, 10, 64)
 		if err != nil {
-			return Statement{}, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
+			return nil, fmt.Errorf("could not parse literal '%s'. %s", t.Lexeme, err)
 		}
-		return Statement{ST_LIT, LiteralExpression{Value{VAL_INT, int64(d)}}}, nil
+		return LiteralExpression{Value{VAL_INT, int64(d)}}, nil
 	case T_KEYWORD:
 		switch t.Lexeme {
 		case "true":
-			return Statement{ST_LIT, LiteralExpression{Value{VAL_TRUE, true}}}, nil
+			return LiteralExpression{Value{VAL_TRUE, true}}, nil
 		case "false":
-			return Statement{ST_LIT, LiteralExpression{Value{VAL_FALSE, false}}}, nil
+			return LiteralExpression{Value{VAL_FALSE, false}}, nil
 		default:
-			return Statement{}, fmt.Errorf("could not parse literal as keyword '%#v'", t)
+			return nil, fmt.Errorf("could not parse literal as keyword '%#v'", t)
 		}
 	case T_STRING:
-		return Statement{ST_LIT, LiteralExpression{Value{VAL_STRING, t.Lexeme}}}, nil
+		return LiteralExpression{Value{VAL_STRING, t.Lexeme}}, nil
 	default:
-		return Statement{}, fmt.Errorf("could not parse literal '%#v'", t)
+		return nil, fmt.Errorf("could not parse literal '%#v'", t)
 	}
 }
 
