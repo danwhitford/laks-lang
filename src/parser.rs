@@ -1,19 +1,19 @@
 use crate::lexer::Token;
 
 #[derive(PartialEq, Debug)]
-enum Stmt {
+pub enum Stmt {
     // Some more stuff
     ExprStmt(Expr),
 }
 
 #[derive(PartialEq, Debug)]
-enum Expr {
+pub enum Expr {
     Lit(Value),
     BinOp(Operator, Box<Expr>, Box<Expr>),
 }
 
 #[derive(PartialEq, Debug)]
-enum Operator {
+pub enum Operator {
     ADD,
     SUB,
     MUL,
@@ -21,11 +21,11 @@ enum Operator {
 }
 
 #[derive(PartialEq, Debug)]
-enum Value {
+pub enum Value {
     IntVal(i64),
 }
 
-fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
+pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
     let mut exprs = Vec::new();
     let mut iter = tokens.iter().peekable();
 
@@ -101,10 +101,6 @@ fn token_to_op(t: &Token) -> Operator {
         Token::Div => Operator::DIV,
         _ => panic!("is not an operator {:?}", t),
     };
-}
-
-fn int_expr(s: &str) -> crate::parser::Value {
-    return Value::IntVal(s.parse().unwrap());
 }
 
 #[cfg(test)]
