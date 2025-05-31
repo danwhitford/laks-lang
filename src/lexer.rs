@@ -12,37 +12,37 @@ pub fn lex(source: &str) -> Vec<Token> {
     let mut tots = Vec::new();
     let mut chars = source.chars().peekable();
 
-    loop {
-        match chars.next() {
-            Some(c) => match c {
-                '0'..'9' => tots.push(number(&mut chars, c)),
-                '+' => tots.push(Token::Plus),
-                '-' => tots.push(Token::Sub),
-                '*' => tots.push(Token::Mult),
-                '/' => tots.push(Token::Div),
-                ';' => tots.push(Token::Semi),
-                c if c.is_whitespace() => (),
-                _ => panic!("don't know this character '{c}'"),
-            },
-            None => return tots,
+    while let Some(c) = chars.next() {
+        let tok = match c {
+            '0'..'9' => Some(number(&mut chars, c)),
+            '+' => Some(Token::Plus),
+            '-' => Some(Token::Sub),
+            '*' => Some(Token::Mult),
+            '/' => Some(Token::Div),
+            ';' => Some(Token::Semi),
+            c if c.is_whitespace() => None,
+            _ => panic!("don't know this character '{c}'"),
+        };
+
+        match tok {
+            Some(t) => tots.push(t),
+            None => (),
         }
     }
+    tots
 }
 
 fn number(iter: &mut std::iter::Peekable<impl Iterator<Item = char>>, c: char) -> Token {
     let mut lexeme = String::from(c);
-    
-    loop {
-        match iter.peek() {
-            Some(c) => match c {
-                '0'..'9' => lexeme.push(iter.next().unwrap()),
-                ';' => return Token::Int(lexeme),
-                c if c.is_whitespace() => return Token::Int(lexeme),
-                _ => panic!("not part of a number '{c}'"),
-            },
-            None => return Token::Int(lexeme),
+
+    while let Some(c) = iter.next_if(|c| matches!(c, '0'..'9')) {
+        match c {
+            '0'..'9' => lexeme.push(c),
+            _ => panic!("not part of a number '{c}'"),
         }
     }
+    
+    Token::Int(lexeme)
 }
 
 #[cfg(test)]
@@ -82,12 +82,7 @@ mod tests {
     #[test]
     fn basic_operators() {
         let l = lex("+ - / *");
-        let want = Vec::from([
-            Token::Plus,
-            Token::Sub,
-            Token::Div,
-            Token::Mult,
-        ]);
+        let want = Vec::from([Token::Plus, Token::Sub, Token::Div, Token::Mult]);
 
         assert_eq!(want, l);
     }

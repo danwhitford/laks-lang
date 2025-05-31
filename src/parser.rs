@@ -26,71 +26,68 @@ pub enum Value {
 }
 
 pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
-    let mut exprs = Vec::new();
+    let mut stmts = Vec::new();
     let mut iter = tokens.iter().peekable();
 
-    loop {
-        match iter.peek() {
-            Some(t) => match t {
-                Token::Int(_) => exprs.push(Stmt::ExprStmt(parse_expr(&mut iter))),
-                _ => panic!("dunno start of expression {:?}", t),
-            },
-            None => return exprs,
-        }
-        match iter.next() {
-            Some(t) => match t {
-                Token::Semi => (),
-                _ => panic!("wanted semicolon got {:?}", t),
-            },
-            None => panic!("wanted semicolon got EOF"),
-        }
+    while let Some(t) = iter.peek() {
+        let stmt = match t {
+            Token::Int(_) => Stmt::ExprStmt(parse_expr(&mut iter)),
+            _ => panic!("dunno start of expression {:?}", t),
+        };
+
+        match iter.next().unwrap() {
+            Token::Semi => (),
+            t => panic!("wanted semi got '{:?}'", t),
+        };
+
+        stmts.push(stmt);
     }
+
+    stmts
 }
 
 fn parse_expr<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
     let mut expr = parse_expr2(iter);
 
-    loop {
-        match iter.peek() {
-            Some(token) => match token {
-                Token::Plus | Token::Sub => {
-                    let op = token_to_op(iter.next().unwrap());
-                    let right = parse_expr2(iter);
-                    expr = Expr::BinOp(op, Box::from(expr), Box::from(right));
-                }
-                _ => return expr,
-            },
-            None => return expr,
+    while let Some(token) = iter.next_if(|t| matches!(t, Token::Plus | Token::Sub)) {
+        match token {
+            Token::Plus | Token::Sub => {
+                let op = token_to_op(token);
+                let right = parse_expr2(iter);
+                expr = Expr::BinOp(op, Box::from(expr), Box::from(right));
+            }
+            _ => panic!("shouldn't happen"),
         }
     }
+
+    expr
 }
 
 fn parse_expr2<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
-    let mut expr = parse_literal(iter.next());
+    let mut expr = parse_literal(iter);
 
-    loop {
-        match iter.peek() {
-            Some(token) => match token {
-                Token::Mult | Token::Div => {
-                    let op = token_to_op(iter.next().unwrap());
-                    let right = parse_literal(iter.next());
-                    expr = Expr::BinOp(op, Box::from(expr), Box::from(right));
-                }
-                _ => return expr,
-            },
-            None => return expr,
+    while let Some(token) = iter.next_if(|t| matches!(t, Token::Mult | Token::Div)) {
+        match token {
+            Token::Mult | Token::Div => {
+                let op = token_to_op(token);
+                let right = parse_literal(iter);
+                expr = Expr::BinOp(op, Box::from(expr), Box::from(right));
+            }
+            _ => panic!("shouldn't happen"),
         }
     }
+
+    expr
 }
 
-fn parse_literal(token: Option<&Token>) -> Expr {
-    return match token {
+fn parse_literal<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
+    match iter.next() {
         Some(token) => match token {
             Token::Int(s) => Expr::Lit(Value::IntVal(s.parse().unwrap())),
             _ => panic!("not a literal '{:?}'", token),
         },
-        None => panic!("wanted literal got nothing!"),
-    };
+        None => panic!("wanted literal got EOF"),
+    }
 }
 
 fn token_to_op(t: &Token) -> Operator {
