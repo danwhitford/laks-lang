@@ -34,10 +34,11 @@ pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
             Token::Int(_) => Stmt::ExprStmt(parse_expr(&mut iter)),
             _ => panic!("dunno start of expression {:?}", t),
         };
-
-        match iter.next().unwrap() {
-            Token::Semi => (),
-            t => panic!("wanted semi got '{:?}'", t),
+        
+        match iter.next() {
+            Some(Token::Semi) => (),
+            Some(t) => panic!("wanted semi got '{:?}'", t),
+            None => panic!("wanted semi got EOF"),
         };
 
         stmts.push(stmt);
@@ -82,22 +83,20 @@ fn parse_expr2<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token
 
 fn parse_literal<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
     match iter.next() {
-        Some(token) => match token {
-            Token::Int(s) => Expr::Lit(Value::IntVal(s.parse().unwrap())),
-            _ => panic!("not a literal '{:?}'", token),
-        },
+        Some(Token::Int(s))=> Expr::Lit(Value::IntVal(s.parse().unwrap())),
+        Some(token) =>  panic!("not a literal '{:?}'", token),
         None => panic!("wanted literal got EOF"),
     }
 }
 
 fn token_to_op(t: &Token) -> Operator {
-    return match t {
+    match t {
         Token::Plus => Operator::ADD,
         Token::Sub => Operator::SUB,
         Token::Mult => Operator::MUL,
         Token::Div => Operator::DIV,
         _ => panic!("is not an operator {:?}", t),
-    };
+    }
 }
 
 #[cfg(test)]
