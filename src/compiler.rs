@@ -22,7 +22,7 @@ fn compile_expr(expr: Expr) -> Vec<u8> {
     match expr {
         Expr::Lit(n) => match n {
             Value::IntVal(d) => {
-                let mut bb = vec![OpCode::PushInt.try_into().expect("op code to byte failed")];
+                let mut bb = vec![OpCode::PushInt.into()];
                 let mut d_bytes = d.to_be_bytes().to_vec();
                 bb.append(&mut d_bytes);
                 bb
@@ -37,25 +37,23 @@ enum OpCode {
     PushInt,
 }
 
-impl TryInto<u8> for OpCode {
-    type Error = ();
-
-    fn try_into(self) -> Result<u8, Self::Error> {
+impl Into<u8> for OpCode {
+    fn into(self) -> u8 {
         match self {
-            OpCode::_NOP => Ok(0x00),
-            OpCode::PushInt => Ok(0x01),
+            OpCode::_NOP => 0x00,
+            OpCode::PushInt => 0x01,
         }
     }
 }
 
 impl TryFrom<u8> for OpCode {
-    type Error = ();
+    type Error = String;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
           0 => Ok(OpCode::_NOP),
           1 => Ok(OpCode::PushInt),
-          _ => Err(()),
+          x => Err(format!("cannot convert '{}' to an OpCode", x)),
         }
     }
 }
