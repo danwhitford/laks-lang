@@ -1,8 +1,9 @@
 use crate::lexer::Token;
+use std::iter::Peekable;
 
 #[derive(PartialEq, Debug)]
 pub enum Stmt {
-    // Some more stuff
+    // Some more stuff tbd
     ExprStmt(Expr),
 }
 
@@ -27,14 +28,14 @@ pub enum Value {
 
 pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
     let mut stmts = Vec::new();
-    let mut iter = tokens.iter().peekable();
+    let mut iter = tokens.into_iter().peekable();
 
     while let Some(t) = iter.peek() {
         let stmt = match t {
             Token::Int(_) => Stmt::ExprStmt(parse_expr(&mut iter)),
             _ => panic!("dunno start of expression {:?}", t),
         };
-        
+
         match iter.next() {
             Some(Token::Semi) => (),
             Some(t) => panic!("wanted semi got '{:?}'", t),
@@ -47,7 +48,7 @@ pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
     stmts
 }
 
-fn parse_expr<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
+fn parse_expr(iter: &mut Peekable<impl Iterator<Item = Token>>) -> Expr {
     let mut expr = parse_expr2(iter);
 
     while let Some(token) = iter.next_if(|t| matches!(t, Token::Plus | Token::Sub)) {
@@ -64,7 +65,7 @@ fn parse_expr<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>
     expr
 }
 
-fn parse_expr2<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
+fn parse_expr2(iter: &mut Peekable<impl Iterator<Item = Token>>) -> Expr {
     let mut expr = parse_literal(iter);
 
     while let Some(token) = iter.next_if(|t| matches!(t, Token::Mult | Token::Div)) {
@@ -81,15 +82,15 @@ fn parse_expr2<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token
     expr
 }
 
-fn parse_literal<'a>(iter: &mut std::iter::Peekable<impl Iterator<Item = &'a Token>>) -> Expr {
+fn parse_literal(iter: &mut Peekable<impl Iterator<Item = Token>>) -> Expr {
     match iter.next() {
-        Some(Token::Int(s))=> Expr::Lit(Value::IntVal(s.parse().unwrap())),
-        Some(token) =>  panic!("not a literal '{:?}'", token),
+        Some(Token::Int(s)) => Expr::Lit(Value::IntVal(s.parse().unwrap())),
+        Some(token) => panic!("not a literal '{:?}'", token),
         None => panic!("wanted literal got EOF"),
     }
 }
 
-fn token_to_op(t: &Token) -> Operator {
+fn token_to_op(t: Token) -> Operator {
     match t {
         Token::Plus => Operator::ADD,
         Token::Sub => Operator::SUB,

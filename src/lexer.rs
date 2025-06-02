@@ -41,7 +41,7 @@ fn number(iter: &mut std::iter::Peekable<impl Iterator<Item = char>>, c: char) -
             _ => panic!("not part of a number '{c}'"),
         }
     }
-    
+
     Token::Int(lexeme)
 }
 
