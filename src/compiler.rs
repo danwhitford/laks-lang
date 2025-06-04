@@ -1,4 +1,6 @@
+
 use crate::parser::Expr;
+use crate::parser::Operator;
 use crate::parser::Stmt;
 use crate::parser::Value;
 
@@ -33,7 +35,17 @@ fn compile_expr(expr: Expr) -> Vec<u8> {
                 bb
             }
         },
-        Expr::BinOp(_, _, _) => todo!(),
+        Expr::BinOp(op, left, right) => {
+            let mut bb = vec![];
+            let mut leftbb = compile_expr(*left);
+            let mut rightbb = compile_expr(*right);
+            let opcode: OpCode = op.into();
+            let opcodebb: u8 = opcode.into();
+            bb.append(&mut leftbb);
+            bb.append(&mut rightbb);
+            bb.push(opcodebb);
+            bb
+        },
     }
 }
 
@@ -41,14 +53,34 @@ pub enum OpCode {
     _NOP,
     PushInt,
     PrintTop,
+    Add,
+    Sub,
+    Mul,
+    Div,
 }
 
-impl Into<u8> for OpCode {
-    fn into(self) -> u8 {
-        match self {
+
+impl From<Operator> for OpCode {
+    fn from(value: Operator) -> Self {
+        match value {
+            Operator::ADD => OpCode::Add,
+            Operator::SUB => OpCode::Sub,
+            Operator::MUL => OpCode::Mul,
+            Operator::DIV => OpCode::Div,
+        }
+    }
+}
+
+impl From<OpCode> for u8 {
+    fn from(value: OpCode) -> Self {
+        match value {
             OpCode::_NOP => 0x00,
             OpCode::PushInt => 0x01,
             OpCode::PrintTop => 0x02,
+            OpCode::Add => 0x03,
+            OpCode::Sub => 0x04,
+            OpCode::Mul => 0x05,
+            OpCode::Div => 0x06,
         }
     }
 }
@@ -61,6 +93,10 @@ impl TryFrom<u8> for OpCode {
           0 => Ok(OpCode::_NOP),
           1 => Ok(OpCode::PushInt),
           2 => Ok(OpCode::PrintTop),
+          3 => Ok(OpCode::Add),
+          4 => Ok(OpCode::Sub),
+          5 => Ok(OpCode::Mul),
+          6 => Ok(OpCode::Div),
           x => Err(format!("cannot convert '{}' to an OpCode", x)),
         }
     }

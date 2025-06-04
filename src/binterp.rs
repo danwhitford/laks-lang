@@ -35,6 +35,16 @@ impl<W: Write> Vm<W> {
                             panic!("failed to write. {:?}", res.err());
                         }
                     }
+                    OpCode::Add => {
+                        let a = self.val_stack.pop().expect("stack is empty");
+                        let b = self.val_stack.pop().expect("stack is empty");
+                        match (a, b) {
+                            (Value::IntVal(x), Value::IntVal(y)) => self.val_stack.push(Value::IntVal(x + y)),
+                        }
+                    },
+                    OpCode::Sub => todo!(),
+                    OpCode::Mul => todo!(),
+                    OpCode::Div => todo!(),
                 },
                 Err(err) => panic!("op code not recognised. {}", err),
             }

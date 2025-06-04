@@ -47,5 +47,6 @@ mod tests {
     #[test]
     fn table_tests() {
         test_case("print 42;", "42\n");
+        test_case("print 2 + 2;", "4\n");
     }
 }
