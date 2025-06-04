@@ -32,9 +32,10 @@ fn compile_expr(expr: Expr) -> Vec<u8> {
     }
 }
 
-enum OpCode {
+pub enum OpCode {
     _NOP,
     PushInt,
+    PrintTop,
 }
 
 impl Into<u8> for OpCode {
@@ -42,6 +43,7 @@ impl Into<u8> for OpCode {
         match self {
             OpCode::_NOP => 0x00,
             OpCode::PushInt => 0x01,
+            OpCode::PrintTop => 0x02,
         }
     }
 }
@@ -53,6 +55,7 @@ impl TryFrom<u8> for OpCode {
         match value {
           0 => Ok(OpCode::_NOP),
           1 => Ok(OpCode::PushInt),
+          2 => Ok(OpCode::PrintTop),
           x => Err(format!("cannot convert '{}' to an OpCode", x)),
         }
     }
