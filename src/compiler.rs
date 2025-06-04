@@ -15,6 +15,11 @@ pub fn compile(stmts: Vec<Stmt>) -> Vec<u8> {
 fn compile_stmt(stmt: Stmt) -> Vec<u8> {
     match stmt {
         Stmt::ExprStmt(expr) => compile_expr(expr),
+        Stmt::Print(expr) => {
+            let mut v = compile_expr(expr);
+            v.push(OpCode::PrintTop.into());
+            v
+        }
     }
 }
 

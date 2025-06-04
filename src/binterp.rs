@@ -73,7 +73,6 @@ mod tests {
 
         let mut buf = vec![];
         run(input, &mut buf);
-        // buf.set_position(0);
         let got = String::from_utf8(buf).expect("should be valid utf8 string");
 
         assert_eq!(want, got);

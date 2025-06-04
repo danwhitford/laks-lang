@@ -3,8 +3,8 @@ use std::iter::Peekable;
 
 #[derive(PartialEq, Debug)]
 pub enum Stmt {
-    // Some more stuff tbd
     ExprStmt(Expr),
+    Print(Expr),
 }
 
 #[derive(PartialEq, Debug)]
@@ -33,6 +33,7 @@ pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
     while let Some(t) = iter.peek() {
         let stmt = match t {
             Token::Int(_) => Stmt::ExprStmt(parse_expr(&mut iter)),
+            Token::Keyword(_) => parse_stmt(&mut iter),
             _ => panic!("dunno start of expression {:?}", t),
         };
 
@@ -46,6 +47,19 @@ pub fn parse(tokens: Vec<Token>) -> Vec<Stmt> {
     }
 
     stmts
+}
+
+fn parse_stmt(iter: &mut Peekable<impl Iterator<Item = Token>>) -> Stmt {
+    match iter.next().expect("there must be a keyword token") {
+        Token::Keyword(s) => match s.as_str() {
+            "print" => {
+                let expr = parse_expr(iter);
+                Stmt::Print(expr)
+            },
+            _ => panic!("don't recognside keyword '{}'", s)
+        },
+        _ => panic!("cannot happen")
+    }
 }
 
 fn parse_expr(iter: &mut Peekable<impl Iterator<Item = Token>>) -> Expr {

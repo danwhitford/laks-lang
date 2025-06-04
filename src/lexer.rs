@@ -6,6 +6,7 @@ pub enum Token {
     Mult,
     Div,
     Semi,
+    Keyword(String),
 }
 
 pub fn lex(source: &str) -> Vec<Token> {
@@ -20,6 +21,7 @@ pub fn lex(source: &str) -> Vec<Token> {
             '*' => Some(Token::Mult),
             '/' => Some(Token::Div),
             ';' => Some(Token::Semi),
+            'a'..'z' => Some(keyword(&mut chars, c)),
             c if c.is_whitespace() => None,
             _ => panic!("don't know this character '{c}'"),
         };
@@ -30,6 +32,19 @@ pub fn lex(source: &str) -> Vec<Token> {
         }
     }
     tots
+}
+
+fn keyword(iter: &mut std::iter::Peekable<impl Iterator<Item = char>>, c: char) -> Token {
+    let mut lexeme = String::from(c);
+
+    while let Some(c) = iter.next_if(|c| matches!(c, 'a'..'z')) {
+        match c {
+            'a'..'z' => lexeme.push(c),
+            _ => panic!("impossible '{c}'"),
+        }
+    }
+
+    Token::Keyword(lexeme)
 }
 
 fn number(iter: &mut std::iter::Peekable<impl Iterator<Item = char>>, c: char) -> Token {
